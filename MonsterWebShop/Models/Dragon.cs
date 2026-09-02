@@ -1,0 +1,22 @@
+﻿namespace MonsterWebShop.Models
+{
+    public enum DragonType
+    {
+        Fire,
+        Ice,
+        Earth,
+        Water
+    }
+    public class Dragon : Monster
+    {
+        public double WingSpan { get; set; }
+        public DragonType Type { get; set; }
+
+        public Dragon(int id, string? name, string? color, string? imagePath, int age, double wingSpan, DragonType type)
+            : base(id, name, color, imagePath, age)
+        {
+            WingSpan = wingSpan;
+            Type = type;
+        }
+    }
+}

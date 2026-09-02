@@ -1,17 +1,17 @@
 ﻿using MonsterWebShop.Models;
 namespace MonsterWebShop.Repo
 {
-    public class DragonRepoList
+    public class MonsterRepoList : IMonsterRepo
     {
         private List<Monster> _monsters = new List<Monster>();
         private int _nextId = 1;
 
-        public DragonRepoList()
+        public MonsterRepoList()
         {
             // Initialize with some sample monsters
-            AddMonster(new Dragon( "Smaug", "Red", "/images/smaug.png", 100, 150, DragonType.Fire));
-            AddMonster(new Dragon( "Toothless", "Black", "/images/toothless.png", 20, 50, DragonType.Ice));
-            AddMonster(new Dragon( "Drogon", "Black and Red", "/images/drogon.png", 5, 100, DragonType.Earth));
+            AddMonster(new Dragon("Smaug", "Red", "/images/smaug.png", 100, 150, DragonType.Fire));
+            AddMonster(new Dragon("Toothless", "Black", "/images/toothless.png", 20, 50, DragonType.Ice));
+            AddMonster(new Dragon("Drogon", "Black and Red", "/images/drogon.png", 5, 100, DragonType.Earth));
         }
         public List<Monster> GetAllMonsters()
         {
@@ -50,6 +50,15 @@ namespace MonsterWebShop.Repo
                     dragon.WingSpan = updatedDragon.WingSpan;
                     dragon.Type = updatedDragon.Type;
                 }
+                if (monster is Undead undead && updatedMonster is Undead updatedUndead)
+                {
+                    undead.Type = updatedUndead.Type;
+                }
+                if (monster is Humanoid humanoid && updatedMonster is Humanoid updatedHumanoid)
+                {
+                    humanoid.Type = updatedHumanoid.Type;
+                }
+                return monster;
             }
             return monster;
         }

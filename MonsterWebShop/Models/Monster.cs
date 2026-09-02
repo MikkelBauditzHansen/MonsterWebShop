@@ -8,9 +8,8 @@
         public string? ImagePath { get; set; }
         public int Age { get; set; }
 
-        public Monster(int id, string? name, string? color, string? imagePath, int age)
+        public Monster(string? name, string? color, string? imagePath, int age)
         {
-            Id = id;
             Name = name;
             Color = color;
             ImagePath = imagePath;

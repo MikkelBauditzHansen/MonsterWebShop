@@ -11,8 +11,8 @@
     {
         public UndeadType Type { get; set; }
 
-        public Undead(int id, string? name, string? color, string? imagePath, int age, UndeadType type)
-            : base(id, name, color, imagePath, age)
+        public Undead(string? name, string? color, string? imagePath, int age, UndeadType type)
+            : base(name, color, imagePath, age)
         {
             Type = type;
         }

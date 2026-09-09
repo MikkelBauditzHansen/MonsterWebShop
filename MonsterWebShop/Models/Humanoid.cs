@@ -11,8 +11,8 @@
     {
         public HumanoidType Type { get; set; }
 
-       public Humanoid(string? name, string? color, string? imagePath, int age, HumanoidType type)
-            : base(name, color, imagePath, age)
+       public Humanoid(string? name, string? color, string? imagePath, int age, double price, HumanoidType type)
+            : base(name, color, imagePath, age, price)
         {
             Type = type;
         }

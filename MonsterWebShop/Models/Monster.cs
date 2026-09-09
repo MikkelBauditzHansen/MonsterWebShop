@@ -7,13 +7,15 @@
         public string? Color { get; set; }
         public string? ImagePath { get; set; }
         public int Age { get; set; }
+        public double Price { get; set; }
 
-        public Monster(string? name, string? color, string? imagePath, int age)
+        public Monster(string? name, string? color, string? imagePath, int age, double price)
         {
             Name = name;
             Color = color;
             ImagePath = imagePath;
             Age = age;
+            Price = price;
         }
         public Monster()
         {

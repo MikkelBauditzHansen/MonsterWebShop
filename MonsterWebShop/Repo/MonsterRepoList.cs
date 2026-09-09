@@ -9,9 +9,9 @@ namespace MonsterWebShop.Repo
         public MonsterRepoList()
         {
             // Initialize with some sample monsters
-            AddMonster(new Dragon("Smaug", "Red", "/images/smaug.png", 100, 150, DragonType.Fire));
-            AddMonster(new Dragon("Toothless", "Black", "/images/toothless.png", 20, 50, DragonType.Ice));
-            AddMonster(new Dragon("Drogon", "Black and Red", "/images/drogon.png", 5, 100, DragonType.Earth));
+            AddMonster(new Dragon("Smaug", "Red", "/images/smaug.png", 100, 10000, 150, DragonType.Fire));
+            AddMonster(new Dragon("Toothless", "Black", "/images/toothless.png", 20, 5000, 50, DragonType.Ice));
+            AddMonster(new Dragon("Drogon", "Black and Red", "/images/drogon.png", 5, 7500, 100, DragonType.Earth));
         }
         public List<Monster> GetAllMonsters()
         {

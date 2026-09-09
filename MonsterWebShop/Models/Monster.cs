@@ -15,5 +15,8 @@
             ImagePath = imagePath;
             Age = age;
         }
+        public Monster()
+        {
+        }
     }
 }

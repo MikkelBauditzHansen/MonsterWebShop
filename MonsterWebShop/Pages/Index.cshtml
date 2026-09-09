@@ -1,10 +1,39 @@
 ﻿@page
 @model IndexModel
-@{
-    ViewData["Title"] = "Home page";
-}
+@using MonsterWebShop.Models
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Monster WebShop</h1>
+
+    <div class="card-container">
+        @foreach (var monster in Model.Monsters)
+        {
+            <div class="card">
+                <img src="@monster.ImagePath"
+                     alt="Billede af @monster.Name"
+                     class="card-img-top" />
+
+                <div class="card-body">
+                    <h5 class="card-title">@monster.Name</h5>
+
+                    <p class="card-text">
+                        Farve: @monster.Color<br />
+                        Alder: @monster.Age år<br />
+
+                        @if (monster is Dragon dragon)
+                        {
+                            <span>Vingefang: @dragon.WingSpan cm</span>
+                    
+                            <br />
+                            <span>Type: @dragon.Type</span>
+                        }
+                    </p>
+
+                    <button class="btn btn-primary">
+                        Se monster
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
 </div>

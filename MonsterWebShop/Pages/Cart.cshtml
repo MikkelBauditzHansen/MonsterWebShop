@@ -1,0 +1,47 @@
+﻿@page
+@model CartModel
+
+<div class="container mt-4">
+
+    <h1>Shopping cart</h1>
+
+    <a asp-page="/Index" class="btn btn-secondary mb-3">
+        Tilbage
+    </a>
+
+    @if (Model.MonstersInCart.Count == 0)
+    {
+        <p>Kurven er tom.</p>
+    }
+    else
+    {
+        @foreach (var monster in Model.MonstersInCart)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+
+                    <h5>@monster.Name</h5>
+
+                    <p>
+                        Farve: @monster.Color
+                        <br />
+                        Alder: @monster.Age
+                    </p>
+
+                    <form method="post" asp-page-handler="Remove">
+                        <input type="hidden"
+                               name="monsterId"
+                               value="@monster.Id" />
+
+                        <button type="submit"
+                                class="btn btn-danger">
+                            Fjern fra kurv
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        }
+    }
+
+</div>

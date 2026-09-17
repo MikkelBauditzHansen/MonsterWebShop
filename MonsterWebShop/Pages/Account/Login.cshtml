@@ -1,4 +1,24 @@
 ﻿@page
 @model MonsterWebShop.Pages.Account.LoginModel
-@{
+<h1>Login</h1>
+
+<form method="post">
+
+    <div>
+        <label>Brugernavn</label>
+        <input asp-for="Username" />
+    </div>
+
+    <div>
+        <label>Adgangskode</label>
+        <input asp-for="Password" type="password" />
+    </div>
+
+    <button type="submit">Login</button>
+
+</form>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <p>@Model.Message</p>
 }

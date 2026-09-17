@@ -9,12 +9,18 @@ namespace MonsterWebShop
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddSingleton<IMonsterRepo, MonsterRepoList>();
-            builder.Services.AddSingleton<MonsterService>();
+            
 
             builder.Services.AddRazorPages();
-
+            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddSingleton<IMonsterRepo, MonsterRepoList>();
+            builder.Services.AddSingleton<MonsterService>();
+            builder.Services.AddScoped<IAccountRepo>(provider => new AccountRepo(connectionString));
+            builder.Services.AddScoped<AccountService>();
+            builder.Services.AddScoped<PasswordHasher>();
+            builder.Services.AddScoped<PasswordPolicy>();
             builder.Services.AddSession();
+
 
             var app = builder.Build();
 

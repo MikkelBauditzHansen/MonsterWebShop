@@ -71,7 +71,7 @@ namespace MonsterWebShop.Repo
             string sql = @"
                 INSERT INTO Account
                 (
-                    AccountID,
+                    
                     Username,
                     PasswordHash,
                     Role,
@@ -80,7 +80,7 @@ namespace MonsterWebShop.Repo
                 )
                 VALUES
                 (
-                    @AccountID,
+                   
                     @Username,
                     @PasswordHash,
                     @Role,
@@ -90,7 +90,6 @@ namespace MonsterWebShop.Repo
 
             using SqlCommand command = new SqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@AccountID", account.Id);
             command.Parameters.AddWithValue("@Username", account.Username);
             command.Parameters.AddWithValue("@PasswordHash", account.PasswordHash);
             command.Parameters.AddWithValue("@Role", account.Role);

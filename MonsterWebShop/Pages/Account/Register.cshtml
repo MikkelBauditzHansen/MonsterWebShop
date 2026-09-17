@@ -1,4 +1,24 @@
 ﻿@page
 @model MonsterWebShop.Pages.Account.RegisterModel
-@{
+<h1>Opret bruger</h1>
+
+<form method="post">
+
+    <div>
+        <label>Brugernavn</label>
+        <input asp-for="Username" />
+    </div>
+
+    <div>
+        <label>Adgangskode</label>
+        <input asp-for="Password" type="password" />
+    </div>
+
+    <button type="submit">Opret bruger</button>
+
+</form>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <p>@Model.Message</p>
 }

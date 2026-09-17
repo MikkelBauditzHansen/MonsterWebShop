@@ -4,13 +4,15 @@
     {
         public int Id { get; set; }
         public string? Username { get; set; }
-        public string? Password { get; set; }
+        public string? PasswordHash { get; set; }
         public virtual string? Role { get; set; }
-        public Account(int id, string username, string password, string role)
+        public int? AdminID { get; set; }
+        public int? CustomerID { get; set; }
+        public Account(int id, string username, string passwordHash, string role)
         {
             Id = id;
             Username = username;
-            Password = password;
+            PasswordHash = passwordHash;
             Role = role;
         }
     }

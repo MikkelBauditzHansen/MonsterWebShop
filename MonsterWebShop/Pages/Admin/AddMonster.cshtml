@@ -1,0 +1,179 @@
+﻿@page
+@using MonsterWebShop.Models
+@model MonsterWebShop.Pages.Admin.AddMonsterModel
+
+@{
+    ViewData["Title"] = "Tilføj monster";
+}
+
+<div class="container mt-4">
+
+    <h1>Tilføj nyt monster</h1>
+
+    <form method="post" enctype="multipart/form-data">
+
+        <!-- Fælles oplysninger -->
+        <div class="mb-3">
+            <label class="form-label">Navn</label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Farve</label>
+            <input asp-for="Color" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Billede</label>
+            <input asp-for="ImagePath"
+                   type="file"
+                   accept="image/*"
+                   class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Alder</label>
+            <input asp-for="Age"
+                   type="number"
+                   class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Pris</label>
+            <input asp-for="Price"
+                   type="number"
+                   step="0.01"
+                   class="form-control" />
+        </div>
+
+
+        <!-- Monster type -->
+        <div class="mb-3">
+            <label class="form-label">Monstertype</label>
+
+            <select asp-for="MonsterType"
+                    id="MonsterType"
+                    class="form-select">
+
+                <option value="">Vælg type</option>
+                <option value="Dragon">Dragon</option>
+                <option value="Humanoid">Humanoid</option>
+                <option value="Undead">Undead</option>
+
+            </select>
+        </div>
+
+
+        <!-- Dragon -->
+        <div id="dragonFields"
+             class="card p-3 mb-3"
+             style="display:none;">
+
+            <h4>Dragon oplysninger</h4>
+
+            <div class="mb-3">
+                <label class="form-label">Vingefang</label>
+
+                <input asp-for="WingSpan"
+                       type="number"
+                       step="0.01"
+                       class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Dragon type</label>
+
+                <select asp-for="DragonType"
+                        asp-items="Html.GetEnumSelectList<DragonType>()"
+                        class="form-select">
+                </select>
+            </div>
+
+        </div>
+
+
+        <!-- Humanoid -->
+        <div id="humanoidFields"
+             class="card p-3 mb-3"
+             style="display:none;">
+
+            <h4>Humanoid oplysninger</h4>
+
+            <div class="mb-3">
+                <label class="form-label">Humanoid type</label>
+
+                <select asp-for="HumanoidType"
+                        asp-items="Html.GetEnumSelectList<HumanoidType>()"
+                        class="form-select">
+                </select>
+            </div>
+
+        </div>
+
+
+        <!-- Undead -->
+        <div id="undeadFields"
+             class="card p-3 mb-3"
+             style="display:none;">
+
+            <h4>Undead oplysninger</h4>
+
+            <div class="mb-3">
+                <label class="form-label">Undead type</label>
+
+                <select asp-for="UndeadType"
+                        asp-items="Html.GetEnumSelectList<UndeadType>()"
+                        class="form-select">
+                </select>
+            </div>
+
+        </div>
+
+
+        <!-- Knapper -->
+        <button type="submit" class="btn btn-primary">
+            Tilføj monster
+        </button>
+
+        <a asp-page="/Index" class="btn btn-secondary">
+            Annuller
+        </a>
+
+    </form>
+
+</div>
+
+
+<script>
+
+    const monsterType = document.getElementById("MonsterType");
+
+    const dragonFields = document.getElementById("dragonFields");
+    const humanoidFields = document.getElementById("humanoidFields");
+    const undeadFields = document.getElementById("undeadFields");
+
+
+    monsterType.addEventListener("change", function () {
+
+        // Skjul alle felter
+        dragonFields.style.display = "none";
+        humanoidFields.style.display = "none";
+        undeadFields.style.display = "none";
+
+
+        // Vis de relevante felter
+        if (this.value === "Dragon") {
+            dragonFields.style.display = "block";
+        }
+
+        if (this.value === "Humanoid") {
+            humanoidFields.style.display = "block";
+        }
+
+        if (this.value === "Undead") {
+            undeadFields.style.display = "block";
+        }
+
+    });
+
+</script>

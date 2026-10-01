@@ -3,7 +3,13 @@
     public class CustomerAccount : Account
     {
         public override string? Role { get; set; } = "Customer";
-        public CustomerAccount(int id, string username, string passwordHash) : base(id, username, passwordHash, "Admin")
+
+        public CustomerAccount(
+            int id,
+            string username,
+            string email,
+            string passwordHash)
+            : base(id, username, email, passwordHash, "Customer")
         {
         }
     }

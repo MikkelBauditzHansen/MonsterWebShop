@@ -32,6 +32,12 @@ namespace MonsterWebShop.Pages
                 CartCount = cart?.Count ?? 0;
             }
         }
+        public IActionResult OnPostLogout()
+        {
+            HttpContext.Session.Clear();
+
+            return RedirectToPage("/Index");
+        }
 
         public IActionResult OnPostAddToCart(int monsterId)
         {

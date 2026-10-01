@@ -1,5 +1,6 @@
 ﻿@page
 @model MonsterWebShop.Pages.Account.RegisterModel
+
 <h1>Opret bruger</h1>
 
 <form method="post">
@@ -7,6 +8,11 @@
     <div>
         <label>Brugernavn</label>
         <input asp-for="Username" />
+    </div>
+
+    <div>
+        <label>Email</label>
+        <input asp-for="Email" type="email" />
     </div>
 
     <div>

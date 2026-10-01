@@ -19,7 +19,16 @@ namespace MonsterWebShop.Repo
             connection.Open();
 
             string sql = @"
-                SELECT AccountID, Username, PasswordHash, Role, AdminID, CustomerID
+                SELECT
+                    AccountID,
+                    Username,
+                    Email,
+                    PasswordHash,
+                    Role,
+                    AdminID,
+                    CustomerID,
+                    PasswordResetToken,
+                    PasswordResetTokenExpires
                 FROM Account
                 WHERE AccountID = @AccountID";
 
@@ -44,13 +53,90 @@ namespace MonsterWebShop.Repo
             connection.Open();
 
             string sql = @"
-                SELECT AccountID, Username, PasswordHash, Role, AdminID, CustomerID
+                SELECT
+                    AccountID,
+                    Username,
+                    Email,
+                    PasswordHash,
+                    Role,
+                    AdminID,
+                    CustomerID,
+                    PasswordResetToken,
+                    PasswordResetTokenExpires
                 FROM Account
                 WHERE Username = @Username";
 
             using SqlCommand command = new SqlCommand(sql, connection);
 
             command.Parameters.AddWithValue("@Username", username);
+
+            using SqlDataReader reader = command.ExecuteReader();
+
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            return CreateAccountFromReader(reader);
+        }
+
+        public Account? GetAccountByEmail(string email)
+        {
+            using SqlConnection connection = new SqlConnection(connectionString);
+
+            connection.Open();
+
+            string sql = @"
+                SELECT
+                    AccountID,
+                    Username,
+                    Email,
+                    PasswordHash,
+                    Role,
+                    AdminID,
+                    CustomerID,
+                    PasswordResetToken,
+                    PasswordResetTokenExpires
+                FROM Account
+                WHERE Email = @Email";
+
+            using SqlCommand command = new SqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@Email", email);
+
+            using SqlDataReader reader = command.ExecuteReader();
+
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            return CreateAccountFromReader(reader);
+        }
+
+        public Account? GetAccountByResetToken(string token)
+        {
+            using SqlConnection connection = new SqlConnection(connectionString);
+
+            connection.Open();
+
+            string sql = @"
+                SELECT
+                    AccountID,
+                    Username,
+                    Email,
+                    PasswordHash,
+                    Role,
+                    AdminID,
+                    CustomerID,
+                    PasswordResetToken,
+                    PasswordResetTokenExpires
+                FROM Account
+                WHERE PasswordResetToken = @Token";
+
+            using SqlCommand command = new SqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@Token", token);
 
             using SqlDataReader reader = command.ExecuteReader();
 
@@ -71,28 +157,48 @@ namespace MonsterWebShop.Repo
             string sql = @"
                 INSERT INTO Account
                 (
-                    
                     Username,
+                    Email,
                     PasswordHash,
                     Role,
                     AdminID,
-                    CustomerID
+                    CustomerID,
+                    PasswordResetToken,
+                    PasswordResetTokenExpires
                 )
                 VALUES
                 (
-                   
                     @Username,
+                    @Email,
                     @PasswordHash,
                     @Role,
                     @AdminID,
-                    @CustomerID
+                    @CustomerID,
+                    @PasswordResetToken,
+                    @PasswordResetTokenExpires
                 )";
 
             using SqlCommand command = new SqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@Username", account.Username);
-            command.Parameters.AddWithValue("@PasswordHash", account.PasswordHash);
-            command.Parameters.AddWithValue("@Role", account.Role);
+            command.Parameters.AddWithValue(
+                "@Username",
+                account.Username ?? (object)DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@Email",
+                account.Email ?? (object)DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@PasswordHash",
+                account.PasswordHash ?? (object)DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@Role",
+                account.Role ?? (object)DBNull.Value
+            );
 
             command.Parameters.AddWithValue(
                 "@AdminID",
@@ -105,6 +211,18 @@ namespace MonsterWebShop.Repo
                 "@CustomerID",
                 account.CustomerID.HasValue
                     ? account.CustomerID.Value
+                    : DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@PasswordResetToken",
+                account.PasswordResetToken ?? (object)DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@PasswordResetTokenExpires",
+                account.PasswordResetTokenExpires.HasValue
+                    ? account.PasswordResetTokenExpires.Value
                     : DBNull.Value
             );
 
@@ -121,18 +239,38 @@ namespace MonsterWebShop.Repo
                 UPDATE Account
                 SET
                     Username = @Username,
+                    Email = @Email,
                     PasswordHash = @PasswordHash,
                     Role = @Role,
                     AdminID = @AdminID,
-                    CustomerID = @CustomerID
+                    CustomerID = @CustomerID,
+                    PasswordResetToken = @PasswordResetToken,
+                    PasswordResetTokenExpires = @PasswordResetTokenExpires
                 WHERE AccountID = @AccountID";
 
             using SqlCommand command = new SqlCommand(sql, connection);
 
             command.Parameters.AddWithValue("@AccountID", account.Id);
-            command.Parameters.AddWithValue("@Username", account.Username);
-            command.Parameters.AddWithValue("@PasswordHash", account.PasswordHash);
-            command.Parameters.AddWithValue("@Role", account.Role);
+
+            command.Parameters.AddWithValue(
+                "@Username",
+                account.Username ?? (object)DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@Email",
+                account.Email ?? (object)DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@PasswordHash",
+                account.PasswordHash ?? (object)DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@Role",
+                account.Role ?? (object)DBNull.Value
+            );
 
             command.Parameters.AddWithValue(
                 "@AdminID",
@@ -145,6 +283,18 @@ namespace MonsterWebShop.Repo
                 "@CustomerID",
                 account.CustomerID.HasValue
                     ? account.CustomerID.Value
+                    : DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@PasswordResetToken",
+                account.PasswordResetToken ?? (object)DBNull.Value
+            );
+
+            command.Parameters.AddWithValue(
+                "@PasswordResetTokenExpires",
+                account.PasswordResetTokenExpires.HasValue
+                    ? account.PasswordResetTokenExpires.Value
                     : DBNull.Value
             );
 
@@ -170,21 +320,37 @@ namespace MonsterWebShop.Repo
 
         private Account CreateAccountFromReader(SqlDataReader reader)
         {
-            return new Account(
+            Account account = new Account(
                 (int)reader["AccountID"],
                 reader["Username"].ToString()!,
+                reader["Email"] == DBNull.Value
+                    ? ""
+                    : reader["Email"].ToString()!,
                 reader["PasswordHash"].ToString()!,
                 reader["Role"].ToString()!
-            )
-            {
-                AdminID = reader["AdminID"] == DBNull.Value
-                    ? null
-                    : (int)reader["AdminID"],
+            );
 
-                CustomerID = reader["CustomerID"] == DBNull.Value
+            account.AdminID =
+                reader["AdminID"] == DBNull.Value
                     ? null
-                    : (int)reader["CustomerID"]
-            };
+                    : (int)reader["AdminID"];
+
+            account.CustomerID =
+                reader["CustomerID"] == DBNull.Value
+                    ? null
+                    : (int)reader["CustomerID"];
+
+            account.PasswordResetToken =
+                reader["PasswordResetToken"] == DBNull.Value
+                    ? null
+                    : reader["PasswordResetToken"].ToString();
+
+            account.PasswordResetTokenExpires =
+                reader["PasswordResetTokenExpires"] == DBNull.Value
+                    ? null
+                    : (DateTime)reader["PasswordResetTokenExpires"];
+
+            return account;
         }
     }
 }

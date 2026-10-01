@@ -4,41 +4,42 @@ using MonsterWebShop.Services;
 
 namespace MonsterWebShop.Pages.Account
 {
-    public class RegisterModel : PageModel
+    public class ResetPasswordModel : PageModel
     {
         private readonly AccountService accountService;
 
-        public RegisterModel(AccountService accountService)
+        public ResetPasswordModel(
+            AccountService accountService)
         {
             this.accountService = accountService;
         }
 
         [BindProperty]
-        public string Username { get; set; } = "";
+        public string Token { get; set; } = "";
 
         [BindProperty]
-        public string Email { get; set; } = "";
-
-        [BindProperty]
-        public string Password { get; set; } = "";
+        public string NewPassword { get; set; } = "";
 
         public string Message { get; set; } = "";
 
-        public void OnGet()
+        public void OnGet(string token)
         {
+            Token = token;
         }
 
         public IActionResult OnPost()
         {
-            bool success = accountService.Register(
-                Username,
-                Email,
-                Password
-            );
+            bool success =
+                accountService.ResetPassword(
+                    Token,
+                    NewPassword
+                );
 
             if (!success)
             {
-                Message = "Brugernavnet eller email findes allerede, eller adgangskoden er ugyldig.";
+                Message =
+                    "Linket er ugyldigt, udløbet eller adgangskoden er ugyldig.";
+
                 return Page();
             }
 

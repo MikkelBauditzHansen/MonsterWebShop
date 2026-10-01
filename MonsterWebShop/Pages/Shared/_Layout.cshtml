@@ -11,6 +11,9 @@
 </head>
 <body>
     <header>
+        @{
+            var accountId = Context.Session.GetInt32("AccountID");
+        }
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-page="/Index">MonsterWebShop</a>
@@ -23,12 +26,28 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Account/Register">Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Account/Login">Login</a>
-                        </li>
+                        @if (accountId == null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Account/Register">Register</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Account/Login">Login</a>
+                            </li>
+                        }
+						@if (accountId != null)
+                        {
+                            <li class="nav-item">
+                                <form method="post" asp-page="/Index" asp-page-handler="Logout">
+                                    <button type="submit" class="nav-link text-dark border-0 bg-transparent">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Cart">Shopping Cart</a>
+                            </li>
+						}
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>

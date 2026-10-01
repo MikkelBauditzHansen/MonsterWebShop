@@ -35,7 +35,9 @@ namespace MonsterWebShop.Pages.Account
                 Message = "Forkert brugernavn eller adgangskode.";
                 return Page();
             }
-
+            HttpContext.Session.SetInt32("AccountID", account.Id);
+            HttpContext.Session.SetString("Username", account.Username);
+            HttpContext.Session.SetString("Role", account.Role);
             return RedirectToPage("/Index");
         }
     }

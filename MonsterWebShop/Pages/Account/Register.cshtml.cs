@@ -22,6 +22,9 @@ namespace MonsterWebShop.Pages.Account
         [BindProperty]
         public string Password { get; set; } = "";
 
+        [BindProperty]
+        public string RepeatPassword { get; set; } = "";
+
         public string Message { get; set; } = "";
 
         public void OnGet()
@@ -30,6 +33,12 @@ namespace MonsterWebShop.Pages.Account
 
         public IActionResult OnPost()
         {
+            if (Password != RepeatPassword)
+            {
+                Message = "Adgangskoderne er ikke ens.";
+                return Page();
+            }
+
             bool success = accountService.Register(
                 Username,
                 Email,
@@ -38,7 +47,9 @@ namespace MonsterWebShop.Pages.Account
 
             if (!success)
             {
-                Message = "Brugernavnet eller email findes allerede, eller adgangskoden er ugyldig.";
+                Message =
+                    "Brugernavnet eller email findes allerede, eller adgangskoden er ugyldig.";
+
                 return Page();
             }
 

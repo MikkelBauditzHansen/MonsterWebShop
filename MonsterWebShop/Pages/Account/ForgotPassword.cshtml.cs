@@ -37,10 +37,10 @@ namespace MonsterWebShop.Pages.Account
                     $"https://localhost:7261/Account/ResetPassword?token={token}";
 
                 bool emailSent =
-      emailService.SendPasswordResetEmail(
-          Email,
-          resetLink
-      );
+                    emailService.SendPasswordResetEmail(
+                        Email,
+                        resetLink
+                    );
 
                 if (!emailSent)
                 {

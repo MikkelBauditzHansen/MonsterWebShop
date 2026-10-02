@@ -20,6 +20,9 @@ namespace MonsterWebShop.Pages.Account
         [BindProperty]
         public string NewPassword { get; set; } = "";
 
+        [BindProperty]
+        public string RepeatPassword { get; set; } = "";
+
         public string Message { get; set; } = "";
 
         public void OnGet(string token)
@@ -29,6 +32,12 @@ namespace MonsterWebShop.Pages.Account
 
         public IActionResult OnPost()
         {
+            if (NewPassword != RepeatPassword)
+            {
+                Message = "Adgangskoderne er ikke ens.";
+                return Page();
+            }
+
             bool success =
                 accountService.ResetPassword(
                     Token,
@@ -38,7 +47,7 @@ namespace MonsterWebShop.Pages.Account
             if (!success)
             {
                 Message =
-                    "Linket er ugyldigt, udløbet eller adgangskoden er ugyldig.";
+                    "Linket er ugyldigt, udløbet eller adgangskoden opfylder ikke kravene.";
 
                 return Page();
             }

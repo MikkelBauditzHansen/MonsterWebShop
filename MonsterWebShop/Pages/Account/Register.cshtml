@@ -17,10 +17,33 @@
 
     <div>
         <label>Adgangskode</label>
-        <input asp-for="Password" type="password" />
+
+        <input asp-for="Password"
+               type="password"
+               id="password" />
+
+        <button type="button"
+                onclick="togglePassword('password')">
+            👁
+        </button>
     </div>
 
-    <button type="submit">Opret bruger</button>
+    <div>
+        <label>Gentag adgangskode</label>
+
+        <input asp-for="RepeatPassword"
+               type="password"
+               id="repeatPassword" />
+
+        <button type="button"
+                onclick="togglePassword('repeatPassword')">
+            👁
+        </button>
+    </div>
+
+    <button type="submit">
+        Opret bruger
+    </button>
 
 </form>
 
@@ -28,3 +51,18 @@
 {
     <p>@Model.Message</p>
 }
+
+<script>
+    function togglePassword(id) {
+
+        const input =
+            document.getElementById(id);
+
+        if (input.type === "password") {
+            input.type = "text";
+        }
+        else {
+            input.type = "password";
+        }
+    }
+</script>

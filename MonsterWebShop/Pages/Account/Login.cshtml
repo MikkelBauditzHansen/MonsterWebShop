@@ -1,5 +1,6 @@
 ﻿@page
 @model MonsterWebShop.Pages.Account.LoginModel
+
 <h1>Login</h1>
 
 <form method="post">
@@ -11,14 +12,42 @@
 
     <div>
         <label>Adgangskode</label>
-        <input asp-for="Password" type="password" />
+
+        <input asp-for="Password"
+               type="password"
+               id="password" />
+
+        <button type="button"
+                onclick="togglePassword()">
+            👁
+        </button>
     </div>
 
     <button type="submit">Login</button>
 
 </form>
 
+<div>
+    <a href="/Account/ForgotPassword">
+        Glemt adgangskode?
+    </a>
+</div>
+
 @if (!string.IsNullOrEmpty(Model.Message))
 {
     <p>@Model.Message</p>
 }
+
+<script>
+    function togglePassword() {
+        const input =
+            document.getElementById("password");
+
+        if (input.type === "password") {
+            input.type = "text";
+        }
+        else {
+            input.type = "password";
+        }
+    }
+</script>

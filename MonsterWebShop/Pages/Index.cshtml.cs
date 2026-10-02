@@ -1,78 +1,92 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MonsterWebShop.Models;
-using MonsterWebShop.Repo;
-using System.Text.Json;
+using MonsterWebShop.Services;
 
 namespace MonsterWebShop.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly IMonsterRepo _monsterRepo;
+        private readonly MonsterService _monsterService;
 
-        public List<Monster> Monsters { get; set; } = new();
+        public IndexModel(MonsterService monsterService)
+        {
+            _monsterService = monsterService;
+        }
+
+        public List<Monster> Monsters { get; set; }
+            = new List<Monster>();
+
+        [BindProperty(SupportsGet = true)]
+        public string SearchText { get; set; } = "";
+
+        [BindProperty(SupportsGet = true)]
+        public string MonsterType { get; set; } = "";
 
         public int CartCount { get; set; }
 
-        public IndexModel(IMonsterRepo monsterRepo)
-        {
-            _monsterRepo = monsterRepo;
-        }
-
         public void OnGet()
         {
-            Monsters = _monsterRepo.GetAllMonsters();
+            Monsters =
+                _monsterService.SearchAndFilter(
+                    SearchText,
+                    MonsterType
+                );
 
-            var cartJson = HttpContext.Session.GetString("Cart");
+            string cart =
+                HttpContext.Session.GetString("Cart") ?? "";
 
-            if (cartJson != null)
+            if (string.IsNullOrEmpty(cart))
             {
-                var cart = JsonSerializer.Deserialize<List<int>>(cartJson);
-
-                CartCount = cart?.Count ?? 0;
-            }
-        }
-        public IActionResult OnPostLogout()
-        {
-            HttpContext.Session.Clear();
-
-            return RedirectToPage("/Index");
-        }
-
-        public IActionResult OnPostAddToCart(int monsterId)
-        {
-            var cartJson = HttpContext.Session.GetString("Cart");
-
-            List<int> cart;
-
-            if (cartJson == null)
-            {
-                cart = new List<int>();
+                CartCount = 0;
             }
             else
             {
-                cart = JsonSerializer.Deserialize<List<int>>(cartJson)
-                       ?? new List<int>();
+                CartCount =
+                    cart.Split(
+                        ',',
+                        StringSplitOptions.RemoveEmptyEntries
+                    ).Length;
             }
+        }
 
-            cart.Add(monsterId);
+        public IActionResult OnPostAddToCart(
+            int monsterId)
+        {
+            string cart =
+                HttpContext.Session.GetString("Cart") ?? "";
+
+            if (string.IsNullOrEmpty(cart))
+            {
+                cart = monsterId.ToString();
+            }
+            else
+            {
+                cart += "," + monsterId;
+            }
 
             HttpContext.Session.SetString(
                 "Cart",
-                JsonSerializer.Serialize(cart)
+                cart
             );
 
             return RedirectToPage();
         }
-        public IActionResult OnPostDelete(int monsterId)
+
+        public IActionResult OnPostDelete(
+            int monsterId)
         {
-            string role = HttpContext.Session.GetString("Role");
-            Monster monster = _monsterRepo.GetMonsterById(monsterId);
-            if (role == "Admin" && monster != null)
+            string? role =
+                HttpContext.Session.GetString("Role");
+
+            if (role != "Admin")
             {
-                _monsterRepo.RemoveMonster(monsterId);
+                return RedirectToPage();
             }
-            return RedirectToPage("/index");
+
+            _monsterService.RemoveMonster(monsterId);
+
+            return RedirectToPage();
         }
     }
 }

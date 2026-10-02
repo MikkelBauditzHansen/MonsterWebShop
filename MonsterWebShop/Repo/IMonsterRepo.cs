@@ -9,5 +9,6 @@ namespace MonsterWebShop.Repo
         Monster? GetMonsterById(int id);
         Monster? RemoveMonster(int id);
         Monster? UpdateMonster(int id, Monster updatedMonster);
+        List<Monster> SearchMonsters(string searchText);
     }
 }

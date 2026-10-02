@@ -578,6 +578,147 @@ namespace MonsterWebShop.Repo
             return monster;
         }
 
+        //searchmonster
+        public List<Monster> SearchMonsters(string searchText)
+        {
+            List<Monster> monsters = new List<Monster>();
+
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                return GetAllMonsters();
+            }
+
+            searchText = searchText.Trim();
+
+            using SqlConnection connection =
+                new SqlConnection(_connectionString);
+
+            connection.Open();
+
+            string sql = @"
+        SELECT
+            ID,
+            Name,
+            Color,
+            ImagePath,
+            Age,
+            Price,
+            HumanoidID,
+            UndeadID,
+            DragonID
+        FROM Monster
+        WHERE Name LIKE @Search
+        OR Color LIKE @Search";
+
+            using SqlCommand command =
+                new SqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue(
+                "@Search",
+                "%" + searchText + "%"
+            );
+
+            using SqlDataReader reader =
+                command.ExecuteReader();
+
+            List<(int Id,
+                  string Name,
+                  string Color,
+                  string ImagePath,
+                  int Age,
+                  double Price,
+                  int? HumanoidId,
+                  int? UndeadId,
+                  int? DragonId)> rows = new();
+
+            while (reader.Read())
+            {
+                rows.Add((
+                    reader.GetInt32(0),
+                    reader.GetString(1),
+                    reader.GetString(2),
+                    reader.GetString(3),
+                    reader.GetInt32(4),
+                    reader.GetDouble(5),
+
+                    reader.IsDBNull(6)
+                        ? null
+                        : reader.GetInt32(6),
+
+                    reader.IsDBNull(7)
+                        ? null
+                        : reader.GetInt32(7),
+
+                    reader.IsDBNull(8)
+                        ? null
+                        : reader.GetInt32(8)
+                ));
+            }
+
+            reader.Close();
+
+            foreach (var row in rows)
+            {
+                Monster monster;
+
+                if (row.DragonId != null)
+                {
+                    monster = GetDragon(
+                        connection,
+                        row.Id,
+                        row.Name,
+                        row.Color,
+                        row.ImagePath,
+                        row.Age,
+                        row.Price,
+                        row.DragonId.Value
+                    );
+                }
+                else if (row.HumanoidId != null)
+                {
+                    monster = GetHumanoid(
+                        connection,
+                        row.Id,
+                        row.Name,
+                        row.Color,
+                        row.ImagePath,
+                        row.Age,
+                        row.Price,
+                        row.HumanoidId.Value
+                    );
+                }
+                else if (row.UndeadId != null)
+                {
+                    monster = GetUndead(
+                        connection,
+                        row.Id,
+                        row.Name,
+                        row.Color,
+                        row.ImagePath,
+                        row.Age,
+                        row.Price,
+                        row.UndeadId.Value
+                    );
+                }
+                else
+                {
+                    monster = new Monster(
+                        row.Name,
+                        row.Color,
+                        row.ImagePath,
+                        row.Age,
+                        row.Price
+                    )
+                    {
+                        Id = row.Id
+                    };
+                }
+
+                monsters.Add(monster);
+            }
+
+            return monsters;
+        }
 
         // ---------------------------------
         // OPDATER MONSTER

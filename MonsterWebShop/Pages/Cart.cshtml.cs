@@ -12,6 +12,12 @@ namespace MonsterWebShop.Pages
 
         public List<Monster> MonstersInCart { get; set; } = new();
 
+        public double Subtotal { get; set; }
+
+        public double Shipping { get; set; }
+
+        public double Total { get; set; }
+
         public CartModel(IMonsterRepo monsterRepo)
         {
             _monsterRepo = monsterRepo;
@@ -61,8 +67,16 @@ namespace MonsterWebShop.Pages
                 if (monster != null)
                 {
                     MonstersInCart.Add(monster);
+
+                    // Læg monsterets pris til subtotal
+                    Subtotal += monster.Price;
                 }
             }
+
+            // Eksempel: gratis levering
+            Shipping = 0;
+
+            Total = Subtotal + Shipping;
         }
     }
 }

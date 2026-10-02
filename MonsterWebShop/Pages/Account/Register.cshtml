@@ -20,7 +20,8 @@
 
         <input asp-for="Password"
                type="password"
-               id="password" />
+               id="password"
+               pattern="^(?=.{8,64}$)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).*$" />
 
         <button type="button"
                 onclick="togglePassword('password')">

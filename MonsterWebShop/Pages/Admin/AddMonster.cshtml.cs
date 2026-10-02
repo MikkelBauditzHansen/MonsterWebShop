@@ -57,13 +57,12 @@ namespace MonsterWebShop.Pages.Admin
 
         public IActionResult OnGet()
         {
-            // Kun administrator må komme ind på siden
-            //string? role = HttpContext.Session.GetString("Role");
+            string? role = HttpContext.Session.GetString("Role");
 
-            //if (role != "Administrator")
-            //{
-            //    return RedirectToPage("/Index");
-            //}
+            if (role != "Admin")
+            {
+                return RedirectToPage("/Index");
+            }
 
             return Page();
         }

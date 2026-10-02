@@ -40,7 +40,15 @@
             👁
         </button>
     </div>
+    <div>
+        <label>Rolle</label>
 
+        <select asp-for="Role">
+            <option value="">Vælg rolle</option>
+            <option value="Admin">Admin</option>
+            <option value="Customer">Customer</option>
+        </select>
+    </div>
     <button type="submit">
         Opret bruger
     </button>

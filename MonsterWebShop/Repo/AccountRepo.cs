@@ -320,15 +320,32 @@ namespace MonsterWebShop.Repo
 
         private Account CreateAccountFromReader(SqlDataReader reader)
         {
-            Account account = new Account(
-                (int)reader["AccountID"],
-                reader["Username"].ToString()!,
-                reader["Email"] == DBNull.Value
-                    ? ""
-                    : reader["Email"].ToString()!,
-                reader["PasswordHash"].ToString()!,
-                reader["Role"].ToString()!
-            );
+            string role = reader["Role"].ToString()!;
+
+            Account account;
+
+            if (role == "Admin")
+            {
+                account = new AdminAccount(
+                    (int)reader["AccountID"],
+                    reader["Username"].ToString()!,
+                    reader["Email"] == DBNull.Value
+                        ? ""
+                        : reader["Email"].ToString()!,
+                    reader["PasswordHash"].ToString()!
+                );
+            }
+            else
+            {
+                account = new CustomerAccount(
+                    (int)reader["AccountID"],
+                    reader["Username"].ToString()!,
+                    reader["Email"] == DBNull.Value
+                        ? ""
+                        : reader["Email"].ToString()!,
+                    reader["PasswordHash"].ToString()!
+                );
+            }
 
             account.AdminID =
                 reader["AdminID"] == DBNull.Value

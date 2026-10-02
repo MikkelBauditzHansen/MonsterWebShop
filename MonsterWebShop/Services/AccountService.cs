@@ -81,9 +81,10 @@ namespace MonsterWebShop.Services
             return token;
         }
         public bool Register(
-            string username,
-            string email,
-            string password)
+    string username,
+    string email,
+    string password,
+    string role)
         {
             Account? existingAccount =
                 accountRepo.GetAccountByUsername(username);
@@ -106,16 +107,35 @@ namespace MonsterWebShop.Services
                 return false;
             }
 
+            // Sørg for at rollen er gyldig
+            if (role != "Admin" && role != "Customer")
+            {
+                return false;
+            }
+
             string passwordHash =
                 passwordHasher.HashPassword(password);
 
-            Account account = new Account(
-                0,
-                username,
-                email,
-                passwordHash,
-                "Customer"
-            );
+            Account account;
+
+            if (role == "Admin")
+            {
+                account = new AdminAccount(
+                    0,
+                    username,
+                    email,
+                    passwordHash
+                );
+            }
+            else
+            {
+                account = new CustomerAccount(
+                    0,
+                    username,
+                    email,
+                    passwordHash
+                );
+            }
 
             accountRepo.AddAccount(account);
 

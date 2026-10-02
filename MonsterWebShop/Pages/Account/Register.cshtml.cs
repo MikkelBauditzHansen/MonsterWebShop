@@ -24,6 +24,8 @@ namespace MonsterWebShop.Pages.Account
 
         [BindProperty]
         public string RepeatPassword { get; set; } = "";
+        [BindProperty]
+        public string Role { get; set; } = "";
 
         public string Message { get; set; } = "";
 
@@ -42,7 +44,8 @@ namespace MonsterWebShop.Pages.Account
             bool success = accountService.Register(
                 Username,
                 Email,
-                Password
+                Password,
+                Role
             );
 
             if (!success)

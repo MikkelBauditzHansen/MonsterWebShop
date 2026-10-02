@@ -52,7 +52,16 @@
                             <br />
                             <span>Type: @dragon.Type</span>
                         }
-                    </p>
+                        @if (monster is Humanoid humanoid)
+                        {
+                            <span>Type: @humanoid.Type</span>
+                        }
+                        @if (monster is Undead undead)
+                        {
+                            <span>Type: @undead.Type</span>
+						}
+		
+                        </p>
 
                     <form method="post" asp-page-handler="AddToCart">
                         <input type="hidden" name="monsterId" value="@monster.Id" />

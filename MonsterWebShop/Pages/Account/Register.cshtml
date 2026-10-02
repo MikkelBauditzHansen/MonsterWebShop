@@ -21,7 +21,11 @@
         <input asp-for="Password"
                type="password"
                id="password"
-               pattern="^(?=.{8,64}$)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).*$" />
+               pattern="^(?=.{8,64}$)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).*$"
+               oninvalid="setPasswordError(this)"
+               oninput="setPasswordError(this)" />
+
+
 
         <button type="button"
                 onclick="togglePassword('password')">
@@ -74,4 +78,34 @@
             input.type = "password";
         }
     }
+    function setPasswordError(input) {
+
+        const password = input.value;
+
+        if (password.length < 8) {
+            input.setCustomValidity(
+                "Adgangskoden skal være mindst 8 tegn."
+            );
+        }
+        else if (password.length > 64) {
+            input.setCustomValidity(
+                "Adgangskoden må højst være 64 tegn."
+            );
+        }
+        else if (!/[A-Z]/.test(password)) {
+            input.setCustomValidity(
+                "Adgangskoden skal indeholde mindst ét stort bogstav."
+            );
+        }
+        else if (!/[^A-Za-z0-9]/.test(password)) {
+            input.setCustomValidity(
+                "Adgangskoden skal indeholde mindst ét specialtegn."
+            );
+        }
+        else {
+            input.setCustomValidity("");
+        }
+    }
+
+
 </script>

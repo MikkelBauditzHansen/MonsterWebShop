@@ -7,7 +7,6 @@
     // Session data used for access control
     string role = HttpContext.Session.GetString("Role");
     int? accountId = HttpContext.Session.GetInt32("AccountID");
-    string[] allowedRoles = new[] { "Administrator" };
 }
 
 <div class="container mt-4">

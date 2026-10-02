@@ -1,47 +1,284 @@
-﻿@page
-@model CartModel
+﻿
+@page
+@using MonsterWebShop.Models
+@model MonsterWebShop.Pages.CartModel
 
-<div class="container mt-4">
+@{
+    ViewData["Title"] = "Shopping cart";
 
-    <h1>Shopping cart</h1>
+    int? accountId = HttpContext.Session.GetInt32("AccountID");
+}
 
-    <a asp-page="/Index" class="btn btn-secondary mb-3">
-        Tilbage
-    </a>
+<div class="container mt-5 mb-5">
 
-    @if (Model.MonstersInCart.Count == 0)
+    <!-- Header -->
+    <div class="mb-5">
+        <h1 class="fw-bold display-6 mb-2">Shopping cart</h1>
+        <p class="text-muted mb-0">
+            Se dine valgte monstre og fortsæt til betaling.
+        </p>
+    </div>
+
+
+    @if (accountId == null)
     {
-        <p>Kurven er tom.</p>
+        <!-- Ikke logget ind -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body text-center py-5 px-4">
+
+                <div class="mb-4">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+                         style="width: 70px; height: 70px;">
+                        <span style="font-size: 30px;">🔒</span>
+                    </div>
+                </div>
+
+                <h3 class="fw-bold mb-3">
+                    Du er ikke logget ind
+                </h3>
+
+                <p class="text-muted mb-4">
+                    Log ind eller opret en bruger for at fortsætte.
+                </p>
+
+                <a asp-page="/Account/Login"
+                   class="btn btn-primary px-4 py-2 me-2 rounded-3">
+                    Log ind
+                </a>
+
+                <a asp-page="/Account/Register"
+                   class="btn btn-outline-secondary px-4 py-2 rounded-3">
+                    Registrer
+                </a>
+
+            </div>
+        </div>
     }
     else
     {
-        @foreach (var monster in Model.MonstersInCart)
-        {
-            <div class="card mb-3">
-                <div class="card-body">
+        <!-- Tilbage-knap -->
+        <div class="mb-4">
+            <a asp-page="/Index"
+               class="btn btn-outline-secondary rounded-3 px-3">
+                ← Tilbage til monstre
+            </a>
+        </div>
 
-                    <h5>@monster.Name</h5>
 
-                    <p>
-                        Farve: @monster.Color
-                        <br />
-                        Alder: @monster.Age
-                    </p>
+        <div class="row g-4">
 
-                    <form method="post" asp-page-handler="Remove">
-                        <input type="hidden"
-                               name="monsterId"
-                               value="@monster.Id" />
+            <!-- PRODUKTER -->
+            <div class="col-lg-8">
 
-                        <button type="submit"
-                                class="btn btn-danger">
-                            Fjern fra kurv
-                        </button>
-                    </form>
+                @if (Model.MonstersInCart.Count == 0)
+                {
+                    <!-- Tom kurv -->
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body text-center py-5 px-4">
+
+                            <div class="mb-4">
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+                                     style="width: 70px; height: 70px;">
+                                    <span style="font-size: 30px;">🛒</span>
+                                </div>
+                            </div>
+
+                            <h4 class="fw-bold mb-3">
+                                Kurven er tom
+                            </h4>
+
+                            <p class="text-muted mb-4">
+                                Du har ikke tilføjet nogle monstre endnu.
+                            </p>
+
+                            <a asp-page="/Index"
+                               class="btn btn-primary px-4 py-2 rounded-3">
+                                Se monstre
+                            </a>
+
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var monster in Model.MonstersInCart)
+                    {
+                        <!-- Produkt -->
+                        <div class="card border-0 shadow-sm rounded-4 mb-3">
+
+                            <div class="card-body p-4">
+
+                                <div class="d-flex align-items-center justify-content-between gap-4">
+
+                                    <!-- Monster information -->
+                                    <div class="flex-grow-1">
+
+                                        <h5 class="fw-bold mb-3">
+                                            @monster.Name
+                                        </h5>
+
+                                        <div class="text-muted small">
+
+                                            <div class="mb-2">
+                                                <strong class="text-dark">Farve:</strong>
+                                                @monster.Color
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <strong class="text-dark">Alder:</strong>
+                                                @monster.Age år
+                                            </div>
+
+                                            @if (monster is Dragon dragon)
+                                            {
+                                                <div class="mb-2">
+                                                    <strong class="text-dark">Vingefang:</strong>
+                                                    @dragon.WingSpan cm
+                                                </div>
+
+                                                <div>
+                                                    <strong class="text-dark">Type:</strong>
+                                                    @dragon.Type
+                                                </div>
+                                            }
+
+                                            @if (monster is Humanoid humanoid)
+                                            {
+                                                <div>
+                                                    <strong class="text-dark">Type:</strong>
+                                                    @humanoid.Type
+                                                </div>
+                                            }
+
+                                            @if (monster is Undead undead)
+                                            {
+                                                <div>
+                                                    <strong class="text-dark">Type:</strong>
+                                                    @undead.Type
+                                                </div>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Pris + Fjern -->
+                                    <div class="d-flex align-items-center gap-4 flex-shrink-0">
+
+                                        <!-- Pris -->
+                                        <div class="text-end">
+
+                                            <small class="text-muted d-block mb-1">
+                                                Pris
+                                            </small>
+
+                                            <span class="fw-bold fs-5">
+                                                @monster.Price DKK
+                                            </span>
+
+                                        </div>
+
+
+                                        <!-- Fjern -->
+                                        <form method="post"
+                                              asp-page-handler="Remove">
+
+                                            <input type="hidden"
+                                                   name="monsterId"
+                                                   value="@monster.Id" />
+
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger rounded-3 px-3">
+                                                Fjern
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+
+            </div>
+
+
+            <!-- ORDRESAMMENDRAG -->
+            <div class="col-lg-4">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body p-4">
+
+                        <h4 class="fw-bold mb-4">
+                            Ordresammendrag
+                        </h4>
+
+
+                        <!-- Subtotal -->
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span class="text-muted">
+                                Subtotal
+                            </span>
+
+                            <span class="fw-medium">
+                                @Model.Subtotal DKK
+                            </span>
+
+                        </div>
+
+
+                        <!-- Levering -->
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span class="text-muted">
+                                Levering
+                            </span>
+
+                            <span class="fw-medium">
+                                @Model.Shipping DKK
+                            </span>
+
+                        </div>
+
+
+                        <hr class="my-4" />
+
+
+                        <!-- Total -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+
+                            <span class="fw-bold fs-5">
+                                Total
+                            </span>
+
+                            <span class="fw-bold fs-4">
+                                @Model.Total DKK
+                            </span>
+
+                        </div>
+
+
+                        @if (Model.MonstersInCart.Count > 0)
+                        {
+                            <button class="btn btn-primary w-100 py-2 rounded-3 fw-semibold">
+                                Gå til betaling
+                            </button>
+                        }
+
+                    </div>
 
                 </div>
+
             </div>
-        }
+
+        </div>
     }
 
 </div>

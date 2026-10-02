@@ -73,16 +73,54 @@ namespace MonsterWebShop.Pages.Admin
             // Tjek at brugeren stadig er administrator
             string? role = HttpContext.Session.GetString("Role");
 
-            //if (role != "Administrator")
-            //{
-            //    return RedirectToPage("/Index");
-            //}
+            // Hvis du vil aktivere admin-tjekket igen:
+            // if (role != "Admin")
+            // {
+            //     return RedirectToPage("/Index");
+            // }
+
 
             string imagePath = "";
 
+            // Tjek om der er uploadet et billede
             if (ImagePath != null)
             {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImagePath.FileName);
+                // Tilladte filendelser
+                string[] allowedExtensions =
+                {
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".gif",
+                    ".webp"
+                };
+
+                // Tilladte filtyper
+                string[] allowedContentTypes =
+                {
+                    "image/jpeg",
+                    "image/png",
+                    "image/gif",
+                    "image/webp"
+                };
+
+                string extension = Path.GetExtension(ImagePath.FileName).ToLower();
+
+                // Tjek både filendelse og ContentType
+                if (!allowedExtensions.Contains(extension) ||
+                    !allowedContentTypes.Contains(ImagePath.ContentType))
+                {
+                    ModelState.AddModelError(
+                        "ImagePath",
+                        "Du må kun uploade billeder (JPG, PNG, GIF eller WEBP)."
+                    );
+
+                    return Page();
+                }
+
+
+                // Lav et unikt filnavn
+                string fileName = Guid.NewGuid().ToString() + extension;
 
                 string folderPath = Path.Combine(
                     Directory.GetCurrentDirectory(),
@@ -94,6 +132,7 @@ namespace MonsterWebShop.Pages.Admin
 
                 string filePath = Path.Combine(folderPath, fileName);
 
+                // Gem billedet
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     ImagePath.CopyTo(stream);
@@ -101,6 +140,8 @@ namespace MonsterWebShop.Pages.Admin
 
                 imagePath = "/images/" + fileName;
             }
+
+
             Monster monster;
 
 

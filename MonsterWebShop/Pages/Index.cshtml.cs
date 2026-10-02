@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MonsterWebShop.Models;
 using MonsterWebShop.Services;
+using System.Text.Json;
 
 namespace MonsterWebShop.Pages
 {
@@ -14,8 +15,7 @@ namespace MonsterWebShop.Pages
             _monsterService = monsterService;
         }
 
-        public List<Monster> Monsters { get; set; }
-            = new List<Monster>();
+        public List<Monster> Monsters { get; set; } = new();
 
         [BindProperty(SupportsGet = true)]
         public string SearchText { get; set; } = "";
@@ -33,41 +33,61 @@ namespace MonsterWebShop.Pages
                     MonsterType
                 );
 
-            string cart =
-                HttpContext.Session.GetString("Cart") ?? "";
+            string? cartJson =
+                HttpContext.Session.GetString("Cart");
 
-            if (string.IsNullOrEmpty(cart))
+            if (string.IsNullOrEmpty(cartJson))
             {
                 CartCount = 0;
+                return;
             }
-            else
+
+            try
             {
-                CartCount =
-                    cart.Split(
-                        ',',
-                        StringSplitOptions.RemoveEmptyEntries
-                    ).Length;
+                List<int> cart =
+                    JsonSerializer.Deserialize<List<int>>(cartJson)
+                    ?? new List<int>();
+
+                CartCount = cart.Count;
+            }
+            catch
+            {
+                HttpContext.Session.Remove("Cart");
+                CartCount = 0;
             }
         }
 
         public IActionResult OnPostAddToCart(
             int monsterId)
         {
-            string cart =
-                HttpContext.Session.GetString("Cart") ?? "";
+            string? cartJson =
+                HttpContext.Session.GetString("Cart");
 
-            if (string.IsNullOrEmpty(cart))
+            List<int> cart;
+
+            if (string.IsNullOrEmpty(cartJson))
             {
-                cart = monsterId.ToString();
+                cart = new List<int>();
             }
             else
             {
-                cart += "," + monsterId;
+                try
+                {
+                    cart =
+                        JsonSerializer.Deserialize<List<int>>(cartJson)
+                        ?? new List<int>();
+                }
+                catch
+                {
+                    cart = new List<int>();
+                }
             }
+
+            cart.Add(monsterId);
 
             HttpContext.Session.SetString(
                 "Cart",
-                cart
+                JsonSerializer.Serialize(cart)
             );
 
             return RedirectToPage();

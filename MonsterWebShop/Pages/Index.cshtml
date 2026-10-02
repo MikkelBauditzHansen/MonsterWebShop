@@ -70,6 +70,15 @@
                             Tilføj til kurv
                         </button>
                     </form>
+                    @if (role == "Admin")
+                    {
+                        <form method="post" asp-page-handler="Delete" class="mt-2">
+                            <input type="hidden" name="monsterId" value="@monster.Id" />
+                            <button type="submit" class="btn btn-danger">
+                                Slet monster
+                            </button>
+                        </form>
+				    }
                 </div>
             </div>
         }

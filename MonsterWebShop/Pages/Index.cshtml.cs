@@ -64,5 +64,15 @@ namespace MonsterWebShop.Pages
 
             return RedirectToPage();
         }
+        public IActionResult OnPostDelete(int monsterId)
+        {
+            string role = HttpContext.Session.GetString("Role");
+            Monster monster = _monsterRepo.GetMonsterById(monsterId);
+            if (role == "Admin" && monster != null)
+            {
+                _monsterRepo.RemoveMonster(monsterId);
+            }
+            return RedirectToPage("/index");
+        }
     }
 }

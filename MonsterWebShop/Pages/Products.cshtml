@@ -1,0 +1,248 @@
+﻿@page
+@using MonsterWebShop.Models
+@model MonsterWebShop.Pages.ProductsModel
+
+@{
+    ViewData["Title"] = "Monstre";
+
+    string role = HttpContext.Session.GetString("Role");
+    int? accountId = HttpContext.Session.GetInt32("AccountID");
+}
+
+<div class="container mt-4">
+
+    <h1 class="text-center mb-4">
+        Monster WebShop
+    </h1>
+
+    @if (accountId == null)
+    {
+        <div class="d-flex justify-content-center align-items-center"
+             style="min-height: 300px;">
+
+            <div class="text-center">
+
+                <h3>Du er ikke logget ind</h3>
+
+                <p>
+                    Log ind eller opret en bruger for at fortsætte.
+                </p>
+
+                <a asp-page="/Account/Login"
+                   class="btn btn-primary me-2">
+                    Log ind
+                </a>
+
+                <a asp-page="/Account/Register"
+                   class="btn btn-secondary">
+                    Registrer
+                </a>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+
+            <a asp-page="/Cart"
+               class="btn btn-secondary">
+
+                Shopping cart (@Model.CartCount)
+
+            </a>
+
+        </div>
+
+
+        <div class="mb-4">
+
+            <form method="get">
+
+                <div class="mb-2">
+
+                    <label>
+                        Søg efter monster
+                    </label>
+
+                    <input asp-for="SearchText"
+                           placeholder="Navn eller farve" />
+
+                </div>
+
+
+                <div class="mb-2">
+
+                    <label>
+                        Monster type
+                    </label>
+
+                    <select asp-for="MonsterType">
+
+                        <option value="">
+                            Alle typer
+                        </option>
+
+                        <option value="Dragon">
+                            Dragon
+                        </option>
+
+                        <option value="Humanoid">
+                            Humanoid
+                        </option>
+
+                        <option value="Undead">
+                            Undead
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    Søg
+
+                </button>
+
+
+                <a href="/"
+                   class="btn btn-secondary">
+
+                    Nulstil
+
+                </a>
+
+            </form>
+
+        </div>
+
+
+        @if (Model.Monsters == null || Model.Monsters.Count == 0)
+        {
+            <p>
+                Ingen produkter matcher din søgning.
+            </p>
+        }
+        else
+        {
+            <div class="card-container">
+
+                @foreach (var monster in Model.Monsters)
+                {
+                    <div class="card">
+
+                        <img src="@monster.ImagePath"
+                             alt="Billede af @monster.Name"
+                             class="card-img-top" />
+
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                @monster.Name
+                            </h5>
+
+
+                            <p class="card-text">
+
+                                Farve:
+                                @monster.Color
+
+                                <br />
+
+                                Alder:
+                                @monster.Age år
+
+                                <br />
+
+                                Pris:
+                                @monster.Price DKK
+
+                                <br />
+
+
+                                @if (monster is Dragon dragon)
+                                {
+                                    <span>
+                                        Vingefang:
+                                        @dragon.WingSpan cm
+                                    </span>
+
+                                    <br />
+
+                                    <span>
+                                        Type:
+                                        @dragon.Type
+                                    </span>
+                                }
+
+
+                                @if (monster is Humanoid humanoid)
+                                {
+                                    <span>
+                                        Type:
+                                        @humanoid.Type
+                                    </span>
+                                }
+
+
+                                @if (monster is Undead undead)
+                                {
+                                    <span>
+                                        Type:
+                                        @undead.Type
+                                    </span>
+                                }
+
+                            </p>
+
+
+                            <form method="post"
+                                  asp-page-handler="AddToCart">
+
+                                <input type="hidden"
+                                       name="monsterId"
+                                       value="@monster.Id" />
+
+                                <button type="submit"
+                                        class="btn btn-primary">
+
+                                    Tilføj til kurv
+
+                                </button>
+
+                            </form>
+
+
+                            @if (role == "Admin")
+                            {
+                                <form method="post"
+                                      asp-page-handler="Delete"
+                                      class="mt-2">
+
+                                    <input type="hidden"
+                                           name="monsterId"
+                                           value="@monster.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-danger">
+
+                                        Slet monster
+
+                                    </button>
+
+                                </form>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+    }
+</div>

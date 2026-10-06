@@ -56,7 +56,7 @@ namespace MonsterWebShop.Pages
                 CartCount = 0;
             }
         }
-
+        
         public IActionResult OnPostAddToCart(
             int monsterId)
         {

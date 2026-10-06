@@ -1,53 +1,136 @@
 ﻿@page
 @model MonsterWebShop.Pages.Account.LoginModel
 
-<h1>Login</h1>
+@{
+    ViewData["Title"] = "Login";
+}
 
-<form method="post">
+<div class="account-page">
 
-    <div>
-        <label>Brugernavn</label>
-        <input asp-for="Username" />
+    <div class="account-card">
+
+        <div class="text-center mb-4">
+            <h1>Login</h1>
+
+            <p class="text-muted">
+                Log ind på din MonsterWebShop-konto.
+            </p>
+        </div>
+
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="alert alert-danger">
+                @Model.Message
+            </div>
+        }
+
+
+        <form method="post">
+
+            <!-- Brugernavn -->
+            <div class="mb-4">
+
+                <label class="form-label">
+                    Brugernavn
+                </label>
+
+                <input asp-for="Username"
+                       class="form-control"
+                       placeholder="Indtast brugernavn" />
+
+            </div>
+
+
+            <!-- Adgangskode -->
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Adgangskode
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input asp-for="Password"
+                           type="password"
+                           id="password"
+                           class="form-control"
+                           placeholder="Indtast adgangskode" />
+
+                    <button type="button"
+                            class="password-toggle"
+                            onclick="togglePassword()"
+                            aria-label="Vis eller skjul adgangskode">
+
+                        <i id="passwordIcon"
+                           class="fa fa-eye"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Glemt adgangskode -->
+            <div class="text-end mb-4">
+
+                <a asp-page="/Account/ForgotPassword"
+                   class="forgot-password">
+                    Glemt adgangskode?
+                </a>
+
+            </div>
+
+
+            <!-- Login -->
+            <button type="submit"
+                    class="btn btn-primary btn-capsul account-submit">
+                Login
+            </button>
+
+        </form>
+
+
+        <div class="account-footer text-center">
+
+            <span class="text-muted">
+                Har du ikke en konto?
+            </span>
+
+            <a asp-page="/Account/Register">
+                Opret bruger
+            </a>
+
+        </div>
+
     </div>
 
-    <div>
-        <label>Adgangskode</label>
-
-        <input asp-for="Password"
-               type="password"
-               id="password" />
-
-        <button type="button"
-                onclick="togglePassword()">
-            👁
-        </button>
-    </div>
-
-    <button type="submit">Login</button>
-
-</form>
-
-<div>
-    <a href="/Account/ForgotPassword">
-        Glemt adgangskode?
-    </a>
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Message))
-{
-    <p>@Model.Message</p>
-}
 
 <script>
     function togglePassword() {
+
         const input =
             document.getElementById("password");
 
+        const icon =
+            document.getElementById("passwordIcon");
+
         if (input.type === "password") {
+
             input.type = "text";
+
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
         }
         else {
+
             input.type = "password";
+
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
         }
     }
 </script>

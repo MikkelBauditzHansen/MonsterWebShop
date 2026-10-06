@@ -11,173 +11,188 @@
 
 <style>
     .cartPage {
-        max-width: 1250px;
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 30px 20px;
+        padding: 50px 30px 80px;
     }
 
     .cartTitle {
-        font-size: 42px;
-        font-weight: 600;
-        margin-bottom: 30px;
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 35px;
     }
 
     .cartLayout {
         display: grid;
         grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
-        gap: 60px;
+        gap: 70px;
         align-items: start;
     }
 
-    .cartLeft {
-        min-width: 0;
-    }
-
+    .cartLeft,
     .cartRight {
         min-width: 0;
     }
 
-    .cartHeading {
-        font-size: 28px;
-        margin-bottom: 25px;
-        font-weight: 500;
-    }
-
+    /* Produkt i kurven */
     .monsterItem {
         display: grid;
-        grid-template-columns: 220px 1fr auto;
-        gap: 24px;
+        grid-template-columns: 180px minmax(0, 1fr) auto;
+        gap: 25px;
         padding: 25px 0;
-        border-bottom: 1px solid #dddddd;
+        border-bottom: 1px solid #e5e5e5;
     }
 
     .monsterImageBox {
-        width: 220px;
-        height: 220px;
-        background-color: #f5f5f5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 180px;
+        height: 180px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        overflow: hidden;
     }
 
     .monsterImage {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
     }
 
     .monsterName {
-        font-size: 21px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.5rem;
         font-weight: 600;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
 
     .monsterInfo {
-        font-size: 17px;
-        color: #555555;
+        color: #666;
         line-height: 1.7;
     }
 
     .monsterPrice {
-        font-size: 19px;
-        font-weight: 600;
+        color: #B47F41;
+        font-size: 1.3rem;
+        font-weight: 700;
         white-space: nowrap;
         text-align: right;
     }
 
     .monsterActions {
-        margin-top: 20px;
+        margin-top: 18px;
     }
 
     .removeButton {
         border: none;
-        background: none;
-        text-decoration: underline;
+        background: transparent;
+        color: #666;
         padding: 0;
-        font-size: 16px;
+        font-size: 0.95rem;
+        text-decoration: underline;
         cursor: pointer;
     }
 
+        .removeButton:hover {
+            color: #B47F41;
+        }
+
+    /* Ordreoversigt */
     .summary {
-        padding-top: 5px;
+        background: #f8f9fa;
+        padding: 35px;
+        border-radius: 10px;
+        position: sticky;
+        top: 90px;
     }
 
     .summaryTitle {
-        font-size: 28px;
-        font-weight: 500;
-        margin-bottom: 35px;
+        font-size: 1.7rem;
+        font-weight: 700;
+        margin-bottom: 30px;
     }
 
     .summaryRow {
         display: flex;
         justify-content: space-between;
         gap: 20px;
-        font-size: 18px;
-        margin-bottom: 22px;
+        font-size: 1rem;
+        margin-bottom: 20px;
     }
 
     .summaryDivider {
         border: 0;
-        border-top: 1px solid #dddddd;
-        margin: 30px 0;
+        border-top: 1px solid #ddd;
+        margin: 25px 0;
     }
 
     .summaryTotal {
         display: flex;
         justify-content: space-between;
         gap: 20px;
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 35px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 30px;
     }
 
     .checkoutButton {
         width: 100%;
         border: none;
-        border-radius: 40px;
-        background-color: #111111;
-        color: white;
-        padding: 18px;
-        font-size: 18px;
+        border-radius: 50px;
+        background: #B47F41;
+        color: #fff;
+        padding: 15px 20px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1rem;
         font-weight: 600;
+        transition: 0.2s ease;
     }
 
         .checkoutButton:hover {
-            background-color: #333333;
+            background: #916634;
         }
 
     .backLink {
         display: inline-block;
         margin-bottom: 30px;
-        color: #111111;
-        text-decoration: underline;
+        color: #666;
+        text-decoration: none;
     }
 
+        .backLink:hover {
+            color: #B47F41;
+        }
+
     .emptyCart {
-        padding: 40px 0;
+        background: #f8f9fa;
+        padding: 50px;
+        border-radius: 10px;
+        text-align: center;
     }
 
     @@media (max-width: 900px) {
         .cartLayout {
             grid-template-columns: 1fr;
+            gap: 40px;
         }
 
         .monsterItem {
-            grid-template-columns: 150px 1fr;
+            grid-template-columns: 130px 1fr;
         }
 
         .monsterImageBox {
-            width: 150px;
-            height: 150px;
+            width: 130px;
+            height: 130px;
         }
 
         .monsterPrice {
             grid-column: 2;
             text-align: left;
         }
+
+        .summary {
+            position: static;
+        }
     }
 </style>
-
 
 <div class="cartPage">
 
@@ -192,12 +207,12 @@
         </p>
 
         <a asp-page="/Account/Login"
-           class="btn btn-dark">
+           class="btn btn-primary btn-capsul me-2">
             Log ind
         </a>
 
         <a asp-page="/Account/Register"
-           class="btn btn-outline-dark">
+           class="btn btn-secondary btn-capsul">
             Registrer
         </a>
     }
@@ -229,8 +244,8 @@
                             Du har ikke tilføjet nogle monstre endnu.
                         </p>
 
-                        <a asp-page="/Index"
-                           class="btn btn-dark">
+                        <a asp-page="/Products"
+                           class="btn btn-primary btn-capsul">
                             Se monstre
                         </a>
 

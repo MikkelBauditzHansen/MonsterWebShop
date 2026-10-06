@@ -1,83 +1,207 @@
 ﻿@page
 @model MonsterWebShop.Pages.Account.RegisterModel
 
-<h1>Opret bruger</h1>
-
-<form method="post">
-
-    <div>
-        <label>Brugernavn</label>
-        <input asp-for="Username" />
-    </div>
-
-    <div>
-        <label>Email</label>
-        <input asp-for="Email" type="email" />
-    </div>
-
-    <div>
-        <label>Adgangskode</label>
-
-        <input asp-for="Password"
-               type="password"
-               id="password"
-               pattern="^(?=.{8,64}$)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).*$"
-               oninvalid="setPasswordError(this)"
-               oninput="setPasswordError(this)" />
-
-
-
-        <button type="button"
-                onclick="togglePassword('password')">
-            👁
-        </button>
-    </div>
-
-    <div>
-        <label>Gentag adgangskode</label>
-
-        <input asp-for="RepeatPassword"
-               type="password"
-               id="repeatPassword" />
-
-        <button type="button"
-                onclick="togglePassword('repeatPassword')">
-            👁
-        </button>
-    </div>
-    <div>
-        <label>Rolle</label>
-
-        <select asp-for="Role">
-            <option value="">Vælg rolle</option>
-            <option value="Admin">Admin</option>
-            <option value="Customer">Customer</option>
-        </select>
-    </div>
-    <button type="submit">
-        Opret bruger
-    </button>
-
-</form>
-
-@if (!string.IsNullOrEmpty(Model.Message))
-{
-    <p>@Model.Message</p>
+@{
+    ViewData["Title"] = "Opret bruger";
 }
 
+<div class="account-page">
+
+    <div class="account-card">
+
+        <div class="text-center mb-4">
+            <h1>Opret bruger</h1>
+
+            <p class="text-muted">
+                Opret en konto hos MonsterWebShop.
+            </p>
+        </div>
+
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="alert alert-danger">
+                @Model.Message
+            </div>
+        }
+
+
+        <form method="post">
+
+            <!-- Brugernavn -->
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Brugernavn
+                </label>
+
+                <input asp-for="Username"
+                       class="form-control"
+                       placeholder="Vælg et brugernavn" />
+
+            </div>
+
+
+            <!-- Email -->
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Email
+                </label>
+
+                <input asp-for="Email"
+                       type="email"
+                       class="form-control"
+                       placeholder="Indtast din email" />
+
+            </div>
+
+
+            <!-- Adgangskode -->
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Adgangskode
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input asp-for="Password"
+                           type="password"
+                           id="password"
+                           class="form-control"
+                           placeholder="Vælg en adgangskode"
+                           pattern="^(?=.{8,64}$)(?=.*[A-Z])(?=.*[^A-Za-z0-9]).*$"
+                           oninvalid="setPasswordError(this)"
+                           oninput="setPasswordError(this)" />
+
+                    <button type="button"
+                            class="password-toggle"
+                            onclick="togglePassword('password', 'passwordIcon')"
+                            aria-label="Vis eller skjul adgangskode">
+
+                        <i id="passwordIcon"
+                           class="fa fa-eye"></i>
+
+                    </button>
+
+                </div>
+
+                <small class="text-muted">
+                    8-64 tegn, mindst ét stort bogstav og ét specialtegn.
+                </small>
+
+            </div>
+
+
+            <!-- Gentag adgangskode -->
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Gentag adgangskode
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input asp-for="RepeatPassword"
+                           type="password"
+                           id="repeatPassword"
+                           class="form-control"
+                           placeholder="Gentag adgangskoden" />
+
+                    <button type="button"
+                            class="password-toggle"
+                            onclick="togglePassword('repeatPassword', 'repeatPasswordIcon')"
+                            aria-label="Vis eller skjul adgangskode">
+
+                        <i id="repeatPasswordIcon"
+                           class="fa fa-eye"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Rolle -->
+            <div class="mb-4">
+
+                <label class="form-label">
+                    Rolle
+                </label>
+
+                <select asp-for="Role"
+                        class="form-select">
+
+                    <option value="">
+                        Vælg rolle
+                    </option>
+
+                    <option value="Admin">
+                        Admin
+                    </option>
+
+                    <option value="Customer">
+                        Customer
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button type="submit"
+                    class="btn btn-primary btn-capsul account-submit">
+                Opret bruger
+            </button>
+
+        </form>
+
+
+        <div class="account-footer text-center">
+
+            <span class="text-muted">
+                Har du allerede en konto?
+            </span>
+
+            <a asp-page="/Account/Login">
+                Login
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script>
-    function togglePassword(id) {
+    function togglePassword(inputId, iconId) {
 
         const input =
-            document.getElementById(id);
+            document.getElementById(inputId);
+
+        const icon =
+            document.getElementById(iconId);
 
         if (input.type === "password") {
+
             input.type = "text";
+
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
         }
         else {
+
             input.type = "password";
+
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
         }
     }
+
+
     function setPasswordError(input) {
 
         const password = input.value;
@@ -106,6 +230,4 @@
             input.setCustomValidity("");
         }
     }
-
-
 </script>

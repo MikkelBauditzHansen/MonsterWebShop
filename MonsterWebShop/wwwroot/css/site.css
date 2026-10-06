@@ -13,12 +13,20 @@ html {
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    scroll-behavior: smooth;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+main {
+    flex: 1;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -61,4 +69,305 @@ body {
 
 .card-text {
     line-height: 1.6;
+}
+.top-nav .navbar-nav li button.nav-link {
+    color: #fff;
+    font-size: 14px;
+    padding: 6px 26px;
+    margin: 6px 5px 0;
+    font-weight: 400;
+    text-transform: uppercase;
+    transition: 0.2s ease-in;
+}
+
+    .top-nav .navbar-nav li button.nav-link:hover {
+        color: #fff;
+        background-color: #B47F41 !important;
+        border-radius: 50px;
+    }
+.intro.intro-bg {
+    height: 100vh;
+    min-height: 100vh;
+    padding-top: 80px;
+    margin: 0;
+    float: none;
+}
+.scroll-down {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 10;
+}
+
+    .scroll-down:hover {
+        color: #B47F41;
+    }
+
+    .scroll-down i {
+        font-size: 22px;
+        animation: scrollArrow 1.5s infinite;
+    }
+
+@keyframes scrollArrow {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(7px);
+    }
+}
+.subpage-content {
+    padding-top: 80px;
+}
+/* Monster kategorier på forsiden */
+.monster-category {
+    background: #fff;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+
+    .monster-category:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .monster-category p {
+        line-height: 1.6;
+    }
+/* Udvalgte monstre på forsiden */
+.featured-monsters {
+    padding: 5rem 0;
+    background: #fff;
+}
+
+    .featured-monsters h2 {
+        font-weight: 700;
+        font-size: 3rem;
+    }
+
+.featured-monster-card {
+    border: none;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+    transition: 0.3s ease;
+}
+
+    .featured-monster-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .featured-monster-card .card-img-top {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+    }
+
+    .featured-monster-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .featured-monster-card .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+.featured-price {
+    color: #B47F41;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+/* Footer */
+.footer {
+    position: static;
+    width: 100%;
+    margin-top: auto;
+}
+/* Products søgning og filter */
+.products-toolbar {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+    .products-toolbar h2 {
+        font-weight: 700;
+    }
+
+    .products-toolbar .form-control,
+    .products-toolbar .form-select {
+        min-height: 48px;
+        border-radius: 6px;
+    }
+
+        .products-toolbar .form-control:focus,
+        .products-toolbar .form-select:focus {
+            border-color: #B47F41;
+            box-shadow: 0 0 0 0.2rem rgba(180, 127, 65, 0.15);
+        }
+/* Produktkort */
+.product-card {
+    width: 330px;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+    transition: 0.3s ease;
+}
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 270px;
+        object-fit: cover;
+    }
+
+    .product-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .product-card .card-title {
+        font-size: 1.6rem;
+        font-weight: 600;
+    }
+
+.product-details {
+    line-height: 1.6;
+}
+
+.product-price {
+    color: #B47F41;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+/* Login og Register */
+.account-page {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    background: #f8f9fa;
+}
+
+.account-card {
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    padding: 45px;
+    border-radius: 10px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08);
+}
+
+    .account-card h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .account-card .form-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    .account-card .form-control {
+        min-height: 50px;
+        border-radius: 6px;
+    }
+
+        .account-card .form-control:focus {
+            border-color: #B47F41;
+            box-shadow: 0 0 0 0.2rem rgba(180, 127, 65, 0.15);
+        }
+
+
+/* Password-felt */
+.password-wrapper {
+    position: relative;
+}
+
+    .password-wrapper .form-control {
+        padding-right: 50px;
+    }
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #777;
+    cursor: pointer;
+}
+
+    .password-toggle:hover {
+        color: #B47F41;
+    }
+
+
+/* Glemt password */
+.forgot-password {
+    color: #666;
+    text-decoration: none;
+}
+
+    .forgot-password:hover {
+        color: #B47F41;
+    }
+
+
+/* Login-knap */
+.account-submit {
+    width: 100%;
+    min-height: 50px;
+    font-size: 1rem;
+}
+
+
+/* Nederste tekst */
+.account-footer {
+    border-top: 1px solid #eee;
+    margin-top: 30px;
+    padding-top: 25px;
+}
+
+    .account-footer a {
+        color: #B47F41;
+        font-weight: 600;
+        text-decoration: none;
+        margin-left: 5px;
+    }
+
+        .account-footer a:hover {
+            text-decoration: underline;
+        }
+.account-card .form-select {
+    min-height: 50px;
+    border-radius: 6px;
+}
+
+    .account-card .form-select:focus {
+        border-color: #B47F41;
+        box-shadow: 0 0 0 0.2rem rgba(180, 127, 65, 0.15);
+    }
+
+.account-card small {
+    display: block;
+    margin-top: 7px;
 }

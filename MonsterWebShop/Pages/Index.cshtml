@@ -9,37 +9,217 @@
     int? accountId = HttpContext.Session.GetInt32("AccountID");
 }
 
-<div class="container mt-4">
+<!-- Hero section -->
+<section class="intro intro-bg bg-overlay parallax">
+    <div class="container">
+        <div class="row">
 
-    <h1 class="text-center mb-4">
-        Monster WebShop
-    </h1>
+            <div class="col-lg-8 col-md-10">
 
-    @if (accountId == null)
-    {
-        <div class="d-flex justify-content-center align-items-center"
-             style="min-height: 300px;">
+                <div class="intro-caption text-white">
 
-            <div class="text-center">
+                    <h1 class="display-3 mb-4">
+                        Monster WebShop
+                    </h1>
 
-                <h3>Du er ikke logget ind</h3>
+                    <p class="lead mb-4">
+                        Find dit næste monster i vores udvalg.
+                    </p>
 
-                <p>
-                    Log ind eller opret en bruger for at fortsætte.
-                </p>
+                    @if (accountId == null)
+                    {
+                        <a asp-page="/Account/Login"
+                           class="btn btn-primary btn-capsul me-2">
+                            Log ind
+                        </a>
 
-                <a asp-page="/Account/Login"
-                   class="btn btn-primary me-2">
-                    Log ind
-                </a>
+                        <a asp-page="/Account/Register"
+                           class="btn btn-light btn-capsul">
+                            Opret bruger
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-page="/Products"
+                           class="btn btn-primary btn-capsul">
+                            Se vores monstre
+                        </a>
+                    }
 
-                <a asp-page="/Account/Register"
-                   class="btn btn-secondary">
-                    Registrer
-                </a>
+                </div>
 
             </div>
 
         </div>
-    }
-</div>
+    </div>
+    <a href="#categories"
+       class="scroll-down"
+       aria-label="Se kategorier">
+
+        <span>Se mere</span>
+        <i class="fa fa-chevron-down"></i>
+
+    </a>
+</section>
+<!-- Monster kategorier -->
+<section id="categories" class="info-section bg-light">
+    <div class="container">
+
+        <div class="head-sec text-center mb-5">
+            <h2>Find det rette monster</h2>
+
+            <p class="text-muted mt-4">
+                Udforsk vores forskellige typer af monstre og find den,
+                der passer bedst til dig.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Dragon -->
+            <div class="col-lg-4 col-md-6">
+                <div class="monster-category text-center h-100 p-4">
+
+                    <i class="fa fa-fire fa-3x text-primary mb-4"></i>
+
+                    <h3>Dragons</h3>
+
+                    <p>
+                        Store og imponerende væsner med forskellige
+                        egenskaber og typer. Se blandt andet deres
+                        vingefang og dragetype.
+                    </p>
+
+                    <a asp-page="/Products"
+                       asp-route-MonsterType="Dragon"
+                       class="btn btn-primary btn-capsul mt-3">
+                        Se Dragons
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- Humanoid -->
+            <div class="col-lg-4 col-md-6">
+                <div class="monster-category text-center h-100 p-4">
+
+                    <i class="fa fa-user fa-3x text-primary mb-4"></i>
+
+                    <h3>Humanoids</h3>
+
+                    <p>
+                        Monstre med menneskelignende egenskaber.
+                        Her finder du forskellige humanoide væsner
+                        med hver deres type og karakteristika.
+                    </p>
+
+                    <a asp-page="/Products"
+                       asp-route-MonsterType="Humanoid"
+                       class="btn btn-primary btn-capsul mt-3">
+                        Se Humanoids
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- Undead -->
+            <div class="col-lg-4 col-md-6">
+                <div class="monster-category text-center h-100 p-4">
+
+                    <i class="fa fa-moon-o fa-3x text-primary mb-4"></i>
+
+                    <h3>Undead</h3>
+
+                    <p>
+                        Mørke og overnaturlige væsner som vampyrer
+                        og andre udøde monstre med deres egne
+                        særlige egenskaber.
+                    </p>
+
+                    <a asp-page="/Products"
+                       asp-route-MonsterType="Undead"
+                       class="btn btn-primary btn-capsul mt-3">
+                        Se Undead
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+<!-- Udvalgte monstre -->
+<section class="featured-monsters">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2>Udvalgte monstre</h2>
+
+            <p class="text-muted">
+                Se nogle af monstrene fra vores udvalg.
+            </p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+
+            @foreach (var monster in Model.FeaturedMonsters)
+            {
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="card featured-monster-card h-100">
+
+                        <img src="@monster.ImagePath"
+                             class="card-img-top"
+                             alt="Billede af @monster.Name" />
+
+                        <div class="card-body">
+
+                            <h3 class="card-title">
+                                @monster.Name
+                            </h3>
+
+                            <p class="text-muted mb-2">
+                                @if (monster is Dragon)
+                                {
+                                    <span>Dragon</span>
+                                }
+                                else if (monster is Humanoid)
+                                {
+                                    <span>Humanoid</span>
+                                }
+                                else if (monster is Undead)
+                                {
+                                    <span>Undead</span>
+                                }
+                            </p>
+
+                            <p class="featured-price">
+                                @monster.Price DKK
+                            </p>
+
+                            <a asp-page="/Products"
+                               class="btn btn-primary btn-capsul">
+                                Se monster
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+        <div class="text-center mt-5">
+
+            <a asp-page="/Products"
+               class="btn btn-primary btn-capsul">
+                Se alle monstre
+            </a>
+
+        </div>
+
+    </div>
+</section>

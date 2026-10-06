@@ -3,9 +3,22 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - MonsterWebShop</title>
+
     <script type="importmap"></script>
+
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- ThemeWagon template -->
+    <link rel="stylesheet" href="~/css/custom-style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/loaders.css" asp-append-version="true" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/font-awesome/css/font-awesome.min.css" />
+
+    <!-- MonsterWebShop -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MonsterWebShop.styles.css" asp-append-version="true" />
 </head>
@@ -13,63 +26,131 @@
     <header>
         @{
             var accountId = Context.Session.GetInt32("AccountID");
+            var role = Context.Session.GetString("Role");
+
+            bool isHomePage = Context.Request.Path == "/";
         }
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">MonsterWebShop</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+
+        <!-- ThemeWagon navigation -->
+        <nav class="navbar navbar-expand-md fixed-top top-nav @(isHomePage ? "" : "light-header")">
+            <div class="container-fluid">
+
+                <!-- Logo / navn -->
+                <a class="navbar-brand" asp-page="/Index">
+                    <strong>MonsterWebShop</strong>
+                </a>
+
+                <!-- Mobile menu -->
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+
+                    <span class="navbar-toggler-icon">
+                        <img src="~/img/icons/menu.png" alt="Menu" />
+                    </span>
+
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse"
+                     id="navbarSupportedContent">
+
+                    <ul class="navbar-nav m-auto text-sm-center text-md-center">
+
+                        <!-- Home -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link" asp-page="/Index">
+                                Home
+                            </a>
                         </li>
+
                         @if (accountId == null)
                         {
+                            <!-- Register -->
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-page="/Account/Register">Register</a>
+                                <a class="nav-link" asp-page="/Account/Register">
+                                    Register
+                                </a>
                             </li>
+
+                            <!-- Login -->
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-page="/Account/Login">Login</a>
+                                <a class="nav-link" asp-page="/Account/Login">
+                                    Login
+                                </a>
                             </li>
                         }
-						@if (accountId != null)
+
+                        @if (accountId != null)
                         {
+                            <!-- Products -->
                             <li class="nav-item">
-                                <form method="post" asp-page="/Index" asp-page-handler="Logout">
-                                    <button type="submit" class="nav-link text-dark border-0 bg-transparent">
-                                        Logout
-                                    </button>
-                                </form>
+                                <a class="nav-link" asp-page="/Products">
+                                    Products
+                                </a>
                             </li>
+
+                            <!-- Shopping cart -->
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-page="/Products">Products</a>
+                                <a class="nav-link" asp-page="/Cart">
+                                    Shopping Cart
+                                </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-page="/Cart">Shopping Cart</a>
-                            </li>
-                            @if (Context.Session.GetString("Role") == "Admin")
+
+                            @if (role == "Admin")
                             {
+                                <!-- Admin -->
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Admin/AddMonster">Add monster</a>
+                                    <a class="nav-link" asp-page="/Admin/AddMonster">
+                                        Add Monster
+                                    </a>
                                 </li>
                             }
+
+                            <!-- Logout -->
+                            <li class="nav-item">
+                                <form method="post"
+                                      asp-page="/Index"
+                                      asp-page-handler="Logout">
+
+                                    <button type="submit"
+                                            class="nav-link border-0 bg-transparent">
+                                        Logout
+                                    </button>
+
+                                </form>
+                            </li>
                         }
+
+                        <!-- Privacy -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link" asp-page="/Privacy">
+                                Privacy
+                            </a>
                         </li>
+
                     </ul>
+
                 </div>
+
+                <!-- Search icon from template -->
+                <ul class="navbar-nav ms-auto search-box">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-page="/Products">
+                            <i class="fa fa-search text-white"></i>
+                        </a>
+                    </li>
+                </ul>
+
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <main role="main" class="@(isHomePage ? "" : "subpage-content")">
+        @RenderBody()
+    </main>
 
     <footer class="border-top footer text-muted">
         <div class="container">

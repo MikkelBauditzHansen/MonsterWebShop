@@ -61,7 +61,7 @@ namespace MonsterWebShop.Pages.Admin
 
             if (role != "Admin")
             {
-                return RedirectToPage("/Index");
+                return RedirectToPage("/Products");
             }
 
             return Page();
@@ -202,7 +202,7 @@ namespace MonsterWebShop.Pages.Admin
 
 
             // Gå tilbage til forsiden
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Products");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MonsterWebShop.Models;
 using MonsterWebShop.Repo;
+using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace MonsterWebShop.Services
@@ -197,8 +198,10 @@ namespace MonsterWebShop.Services
 
         public Account? Login(
             string username,
-            string password)
+            string password,
+            string ip)
         {
+            Debug.WriteLine($"ip is {ip}");
             Account? account =
                 accountRepo.GetAccountByUsername(username);
 
@@ -220,5 +223,11 @@ namespace MonsterWebShop.Services
 
             return account;
         }
+
+        private void LogLogin()
+        {
+
+        }
+
     }
 }

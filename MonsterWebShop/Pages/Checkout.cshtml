@@ -1,0 +1,113 @@
+﻿@page
+@using MonsterWebShop.Models
+@model MonsterWebShop.Pages.CheckoutModel
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container py-5">
+
+    <div class="mb-5">
+        <h1 class="fw-bold">Checkout</h1>
+        <p class="text-muted">
+            Gennemgå din ordre, inden du fortsætter til betaling.
+        </p>
+    </div>
+
+    <div class="row g-5">
+
+        <!-- Produkter -->
+        <div class="col-lg-8">
+
+            <h3 class="mb-4">Din ordre</h3>
+
+            @foreach (var monster in Model.MonstersInCart)
+            {
+                <div class="d-flex align-items-center gap-4 border-bottom py-4">
+
+                    <img src="@monster.ImagePath"
+                         alt="@monster.Name"
+                         style="width:110px;height:110px;object-fit:cover;border-radius:8px;" />
+
+                    <div class="flex-grow-1">
+                        <h5 class="fw-bold">@monster.Name</h5>
+
+                        <p class="text-muted mb-1">
+                            @if (monster is Dragon)
+                            {
+                                <span>Dragon</span>
+                            }
+                            else if (monster is Humanoid)
+                            {
+                                <span>Humanoid</span>
+                            }
+                            else if (monster is Undead)
+                            {
+                                <span>Undead</span>
+                            }
+                        </p>
+
+                        <strong class="text-primary">
+                            @monster.Price.ToString("N2") DKK
+                        </strong>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+        <!-- Ordreoversigt -->
+        <div class="col-lg-4">
+
+            <div class="p-4 rounded-3 bg-light">
+
+                <h3 class="fw-bold mb-4">Ordreoversigt</h3>
+
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Subtotal</span>
+                    <span>@Model.Subtotal.ToString("N2") DKK</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Levering</span>
+                    <span>Gratis</span>
+                </div>
+
+                <hr />
+
+                <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
+                    <span>Total</span>
+                    <span>@Model.Total.ToString("N2") DKK</span>
+                </div>
+
+                <div class="alert alert-info small">
+                    <i class="fa fa-info-circle me-2"></i>
+                    Dette er en simuleret betaling.
+                    Der bliver ikke trukket rigtige penge.
+                </div>
+
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger mb-3"></div>
+
+                    <button type="submit"
+                            class="btn btn-primary btn-capsul w-100 py-3">
+                        <i class="fa fa-lock me-2"></i>
+                        Gennemfør simuleret betaling
+                    </button>
+                </form>
+
+                <a asp-page="/Cart"
+                   class="d-block text-center mt-4 text-decoration-none">
+                    ← Tilbage til kurven
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

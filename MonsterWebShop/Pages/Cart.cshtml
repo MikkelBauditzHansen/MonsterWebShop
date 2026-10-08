@@ -144,10 +144,14 @@
         font-size: 1rem;
         font-weight: 600;
         transition: 0.2s ease;
+        display: block;
+        text-align: center;
+        text-decoration: none;
     }
 
         .checkoutButton:hover {
             background: #916634;
+            color: #fff;
         }
 
     .backLink {
@@ -408,9 +412,10 @@
 
                     @if (Model.MonstersInCart.Count > 0)
                     {
-                        <button class="checkoutButton">
+                        <a asp-page="/Checkout"
+                           class="checkoutButton">
                             Gå til kassen
-                        </button>
+                        </a>
                     }
 
                 </div>

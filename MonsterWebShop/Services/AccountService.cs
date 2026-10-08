@@ -142,6 +142,59 @@ namespace MonsterWebShop.Services
             return true;
         }
 
+        public bool ChangePassword(
+            int accountId,
+            string currentPassword,
+            string newPassword)
+        {
+            // Hent den bruger, som er logget ind
+            Account? account = accountRepo.GetAccount(accountId);
+
+            if (account == null)
+            {
+                return false;
+            }
+
+            // Kontrollér den nuværende adgangskode
+            bool currentPasswordCorrect =
+                passwordHasher.VerifyPassword(
+                    currentPassword,
+                    account.PasswordHash!
+                );
+
+            if (!currentPasswordCorrect)
+            {
+                return false;
+            }
+
+            // Kontrollér at den nye adgangskode opfylder kravene
+            if (!PasswordPolicy.IsValid(newPassword))
+            {
+                return false;
+            }
+
+            // Undgå at genbruge den nuværende adgangskode
+            if (passwordHasher.VerifyPassword(
+                newPassword,
+                account.PasswordHash!))
+            {
+                return false;
+            }
+
+            // Hash den nye adgangskode
+            account.PasswordHash =
+                passwordHasher.HashPassword(newPassword);
+
+            // Ugyldiggør eventuelle eksisterende reset-links
+            account.PasswordResetToken = null;
+            account.PasswordResetTokenExpires = null;
+
+            // Gem ændringen i databasen
+            accountRepo.UpdateAccount(account);
+
+            return true;
+        }
+
         public Account? Login(
             string username,
             string password)

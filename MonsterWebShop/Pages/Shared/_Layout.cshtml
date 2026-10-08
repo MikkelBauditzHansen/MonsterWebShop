@@ -99,7 +99,12 @@
                                     Shopping Cart
                                 </a>
                             </li>
-
+                            <!-- Profile -->
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Profile">
+                                    Min Profil
+                                </a>
+                            </li>
                             @if (role == "Admin")
                             {
                                 <!-- Admin -->
@@ -125,12 +130,7 @@
                             </li>
                         }
 
-                        <!-- Privacy -->
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Privacy">
-                                Privacy
-                            </a>
-                        </li>
+                        
 
                     </ul>
 

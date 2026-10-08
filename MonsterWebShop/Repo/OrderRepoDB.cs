@@ -291,10 +291,55 @@ namespace MonsterWebShop.Repo
         }
 
 
+
         public List<Order> GetOrdersByAccountId(int accountId)
         {
-            throw new NotImplementedException();
+            List<Order> orders = new();
+
+            using SqlConnection connection =
+                new SqlConnection(_connectionString);
+
+            connection.Open();
+
+            string sql = @"
+        SELECT
+            OrderID,
+            AccountID,
+            OrderDate,
+            TotalAmount,
+            PaymentStatus,
+            CheckoutToken
+        FROM Orders
+        WHERE AccountID = @AccountID
+        ORDER BY OrderDate DESC, OrderID DESC";
+
+            using SqlCommand command =
+                new SqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue(
+                "@AccountID", accountId);
+
+            using SqlDataReader reader =
+                command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Order order = new Order
+                {
+                    OrderID = reader.GetInt32(0),
+                    AccountID = reader.GetInt32(1),
+                    OrderDate = reader.GetDateTime(2),
+                    TotalAmount = reader.GetDecimal(3),
+                    PaymentStatus = reader.GetString(4),
+                    CheckoutToken = reader.GetGuid(5)
+                };
+
+                orders.Add(order);
+            }
+
+            return orders;
         }
+
         public bool CompletePayment(int orderId, int accountId)
         {
             using SqlConnection connection =

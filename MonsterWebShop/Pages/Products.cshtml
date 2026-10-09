@@ -229,6 +229,12 @@
 
                                 @if (role == "Admin")
                                 {
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-capsul mt-2"
+                                            onclick="toggleMonsterEdit(@monster.Id)">
+                                        <i class="fa fa-pencil me-1"></i>
+                                        Rediger monster
+                                    </button>
                                     <form method="post"
                                           asp-page-handler="Delete"
                                           class="mt-2">
@@ -243,6 +249,155 @@
                                         </button>
 
                                     </form>
+
+                                    <div id="edit-monster-@monster.Id"
+                                         class="monster-edit-form mt-3 p-3 border rounded"
+                                         style="display:none; background:#fafafa;">
+
+                                        <h5 class="fw-bold mb-3">
+                                            Rediger @monster.Name
+                                        </h5>
+
+                                        <form method="post"
+                                              asp-page-handler="Edit"
+                                              enctype="multipart/form-data">
+
+                                            <input type="hidden"
+                                                   name="monsterId"
+                                                   value="@monster.Id" />
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Navn</label>
+                                                <input type="text"
+                                                       name="name"
+                                                       value="@monster.Name"
+                                                       maxlength="100"
+                                                       class="form-control"
+                                                       required />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Farve</label>
+                                                <input type="text"
+                                                       name="color"
+                                                       value="@monster.Color"
+                                                       maxlength="50"
+                                                       class="form-control"
+                                                       required />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Skift billede</label>
+
+                                                <input type="file"
+                                                       name="newImage"
+                                                       accept="image/jpeg,image/png,image/webp"
+                                                       class="form-control" />
+
+                                                <small class="text-muted">
+                                                    Lad feltet være tomt for at beholde det nuværende billede.
+                                                    Maks. 5 MB.
+                                                </small>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Alder</label>
+                                                <input type="number"
+                                                       name="age"
+                                                       value="@monster.Age"
+                                                       min="0"
+                                                       class="form-control"
+                                                       required />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Pris (DKK)</label>
+                                                <input type="number"
+                                                       name="price"
+                                                       value="@monster.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                                       min="0"
+                                                       step="0.01"
+                                                       class="form-control"
+                                                       required />
+                                            </div>
+
+                                            @if (monster is Dragon dragonEdit)
+                                            {
+                                                <div class="mb-3">
+                                                    <label class="form-label">Vingefang (cm)</label>
+                                                    <input type="number"
+                                                           name="wingSpan"
+                                                           value="@dragonEdit.WingSpan.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                                           min="0"
+                                                           step="0.01"
+                                                           class="form-control"
+                                                           required />
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Dragetype</label>
+                                                    <select name="monsterSubtype"
+                                                            class="form-select">
+                                                        @foreach (DragonType type in Enum.GetValues<DragonType>())
+                                                        {
+                                                            <option value="@((int)type)"
+                                                                    selected="@(dragonEdit.Type == type)">
+                                                                @type
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            }
+                                            else if (monster is Humanoid humanoidEdit)
+                                            {
+                                                <div class="mb-3">
+                                                    <label class="form-label">Humanoidtype</label>
+                                                    <select name="monsterSubtype"
+                                                            class="form-select">
+                                                        @foreach (HumanoidType type in Enum.GetValues<HumanoidType>())
+                                                        {
+                                                            <option value="@((int)type)"
+                                                                    selected="@(humanoidEdit.Type == type)">
+                                                                @type
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            }
+                                            else if (monster is Undead undeadEdit)
+                                            {
+                                                <div class="mb-3">
+                                                    <label class="form-label">Undeadtype</label>
+                                                    <select name="monsterSubtype"
+                                                            class="form-select">
+                                                        @foreach (UndeadType type in Enum.GetValues<UndeadType>())
+                                                        {
+                                                            <option value="@((int)type)"
+                                                                    selected="@(undeadEdit.Type == type)">
+                                                                @type
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            }
+
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <button type="submit"
+                                                        class="btn btn-success btn-capsul">
+                                                    <i class="fa fa-check me-1"></i>
+                                                    Gem
+                                                </button>
+
+                                                <button type="button"
+                                                        class="btn btn-secondary btn-capsul"
+                                                        onclick="toggleMonsterEdit(@monster.Id)">
+                                                    Annuller
+                                                </button>
+                                            </div>
+
+                                        </form>
+                                    </div>
+
                                 }
 
                             </div>
@@ -256,3 +411,21 @@
         }
     }
 </div>
+@section Scripts {
+    <script>
+        function toggleMonsterEdit(monsterId) {
+            const editForm =
+                document.getElementById("edit-monster-" + monsterId);
+
+            if (!editForm) {
+                return;
+            }
+
+            if (editForm.style.display === "none") {
+                editForm.style.display = "block";
+            } else {
+                editForm.style.display = "none";
+            }
+        }
+    </script>
+}

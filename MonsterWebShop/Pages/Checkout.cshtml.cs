@@ -81,7 +81,7 @@ namespace MonsterWebShop.Pages
 
             // Undgå at oprette samme checkout igen.
             Order? existingOrder =
-                _orderRepo.GetOrderByCheckoutToken(token);
+                _orderRepo.GetOrderByCheckoutToken(token, accountId.Value);
 
 
             if (existingOrder != null)
@@ -136,7 +136,7 @@ namespace MonsterWebShop.Pages
             };
 
             // Priserne genberegnes i repositoryet.
-            Order createdOrder = _orderRepo.CreateOrder(order);
+            Order createdOrder = _orderRepo.CreateOrder(order, accountId.Value);
 
             bool paymentSuccessful =
                 _orderRepo.CompletePayment(

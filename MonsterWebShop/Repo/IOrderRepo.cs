@@ -6,11 +6,14 @@ namespace MonsterWebShop.Repo
     {
         Order? GetOrderById(int orderId);
 
-        Order? GetOrderByCheckoutToken(Guid checkoutToken);
-
+        Order? GetOrderByCheckoutToken(
+        Guid checkoutToken,
+        int accountId);
         List<Order> GetOrdersByAccountId(int accountId);
         Order? GetOrderForCustomer(int orderId, int accountId);
-        Order CreateOrder(Order order);
+        Order CreateOrder(
+        Order order,
+        int authenticatedAccountId);
         bool CompletePayment(int orderId, int accountId);
 
     }

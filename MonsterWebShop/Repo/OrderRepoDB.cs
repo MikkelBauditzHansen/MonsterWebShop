@@ -14,10 +14,21 @@ namespace MonsterWebShop.Repo
             _connectionString = connectionString;
         }
 
-        public Order CreateOrder(Order order)
+        public Order CreateOrder(
+        Order order,
+        int authenticatedAccountId)
         {
-            if (order.AccountID <= 0)
-                throw new ArgumentException("Ugyldig bruger.");
+            if (authenticatedAccountId <= 0)
+            {
+                throw new UnauthorizedAccessException(
+                    "Brugeren er ikke autentificeret.");
+            }
+
+            if (order.AccountID != authenticatedAccountId)
+            {
+                throw new UnauthorizedAccessException(
+                    "Du kan ikke oprette ordrer for andre brugere.");
+            }
 
             if (order.CheckoutToken == Guid.Empty)
                 throw new ArgumentException("CheckoutToken mangler.");
@@ -245,7 +256,10 @@ namespace MonsterWebShop.Repo
 
 
 
-        public Order? GetOrderByCheckoutToken(Guid checkoutToken)
+
+        public Order? GetOrderByCheckoutToken(
+            Guid checkoutToken,
+            int accountId)
         {
             using SqlConnection connection =
                 new SqlConnection(_connectionString);
@@ -261,15 +275,19 @@ namespace MonsterWebShop.Repo
             PaymentStatus,
             CheckoutToken
         FROM Orders
-        WHERE CheckoutToken = @CheckoutToken";
+        WHERE CheckoutToken = @CheckoutToken
+        AND AccountID = @AccountID";
 
             using SqlCommand command =
                 new SqlCommand(sql, connection);
 
             command.Parameters.Add(
-                "@CheckoutToken",
-                System.Data.SqlDbType.UniqueIdentifier
+                "@CheckoutToken", SqlDbType.UniqueIdentifier
             ).Value = checkoutToken;
+
+            command.Parameters.Add(
+                "@AccountID", SqlDbType.Int
+            ).Value = accountId;
 
             using SqlDataReader reader =
                 command.ExecuteReader();
@@ -289,6 +307,7 @@ namespace MonsterWebShop.Repo
                 CheckoutToken = reader.GetGuid(5)
             };
         }
+
 
 
 
@@ -339,6 +358,7 @@ namespace MonsterWebShop.Repo
 
             return orders;
         }
+
         public Order? GetOrderForCustomer(int orderId, int accountId)
         {
             using SqlConnection connection =
@@ -347,31 +367,47 @@ namespace MonsterWebShop.Repo
             connection.Open();
 
             string sql = @"
-        SELECT *
-        FROM [Order]
+        SELECT
+            OrderID,
+            AccountID,
+            OrderDate,
+            TotalAmount,
+            PaymentStatus,
+            CheckoutToken
+        FROM Orders
         WHERE OrderID = @OrderID
         AND AccountID = @AccountID";
 
             using SqlCommand command =
                 new SqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@OrderID", orderId);
-            command.Parameters.AddWithValue("@AccountID", accountId);
+            command.Parameters.Add(
+                "@OrderID", SqlDbType.Int
+            ).Value = orderId;
 
-            using SqlDataReader reader = command.ExecuteReader();
+            command.Parameters.Add(
+                "@AccountID", SqlDbType.Int
+            ).Value = accountId;
 
-            if (reader.Read())
+            using SqlDataReader reader =
+                command.ExecuteReader();
+
+            if (!reader.Read())
             {
-                return new Order
-                {
-                    OrderID = (int)reader["OrderID"],
-                    AccountID = (int)reader["AccountID"]
-                    // Tilføj de øvrige felter fra din Order-model
-                };
+                return null;
             }
 
-            return null;
+            return new Order
+            {
+                OrderID = reader.GetInt32(0),
+                AccountID = reader.GetInt32(1),
+                OrderDate = reader.GetDateTime(2),
+                TotalAmount = reader.GetDecimal(3),
+                PaymentStatus = reader.GetString(4),
+                CheckoutToken = reader.GetGuid(5)
+            };
         }
+
         public bool CompletePayment(int orderId, int accountId)
         {
             using SqlConnection connection =

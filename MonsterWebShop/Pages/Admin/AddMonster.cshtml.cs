@@ -70,15 +70,16 @@ namespace MonsterWebShop.Pages.Admin
 
         public IActionResult OnPost()
         {
-            // Tjek at brugeren stadig er administrator
-            string? role = HttpContext.Session.GetString("Role");
+            int? accountId =
+                HttpContext.Session.GetInt32("AccountID");
 
-            // Hvis du vil aktivere admin-tjekket igen:
-            // if (role != "Admin")
-            // {
-            //     return RedirectToPage("/Index");
-            // }
+            string? role =
+                HttpContext.Session.GetString("Role");
 
+            if (accountId == null || role != "Admin")
+            {
+                return RedirectToPage("/Products");
+            }
 
             string imagePath = "";
 

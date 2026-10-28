@@ -9,7 +9,7 @@ namespace MonsterWebShop.Repo
         Order? GetOrderByCheckoutToken(Guid checkoutToken);
 
         List<Order> GetOrdersByAccountId(int accountId);
-
+        Order? GetOrderForCustomer(int orderId, int accountId);
         Order CreateOrder(Order order);
         bool CompletePayment(int orderId, int accountId);
 

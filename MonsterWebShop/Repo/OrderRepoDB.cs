@@ -339,7 +339,39 @@ namespace MonsterWebShop.Repo
 
             return orders;
         }
+        public Order? GetOrderForCustomer(int orderId, int accountId)
+        {
+            using SqlConnection connection =
+                new SqlConnection(_connectionString);
 
+            connection.Open();
+
+            string sql = @"
+        SELECT *
+        FROM [Order]
+        WHERE OrderID = @OrderID
+        AND AccountID = @AccountID";
+
+            using SqlCommand command =
+                new SqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@OrderID", orderId);
+            command.Parameters.AddWithValue("@AccountID", accountId);
+
+            using SqlDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                return new Order
+                {
+                    OrderID = (int)reader["OrderID"],
+                    AccountID = (int)reader["AccountID"]
+                    // Tilføj de øvrige felter fra din Order-model
+                };
+            }
+
+            return null;
+        }
         public bool CompletePayment(int orderId, int accountId)
         {
             using SqlConnection connection =

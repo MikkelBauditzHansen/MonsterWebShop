@@ -13,10 +13,11 @@ namespace MonsterWebShop.Pages
         private readonly CartCookieService _cartCookieService;
 
         private readonly AccessControlService _accessControl;
-        public ProductsModel(MonsterService monsterService, AccessControlService accessControlService)
+        public ProductsModel(MonsterService monsterService, AccessControlService accessControlService, CartCookieService cartCookieService)
         {
             _monsterService = monsterService;
             _accessControl = accessControlService;
+            _cartCookieService = cartCookieService;
         }
 
         public List<Monster> Monsters { get; set; } = new();
@@ -29,13 +30,7 @@ namespace MonsterWebShop.Pages
 
         public int CartCount { get; set; }
 
-        public ProductsModel(
-            MonsterService monsterService,
-            CartCookieService cartCookieService)
-        {
-            _monsterService = monsterService;
-            _cartCookieService = cartCookieService;
-        }
+       
 
         // Vis produkter og antal i kurven
         public void OnGet()

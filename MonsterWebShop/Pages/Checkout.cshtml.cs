@@ -16,7 +16,7 @@ namespace MonsterWebShop.Pages
 
         public CheckoutModel(
             IMonsterRepo monsterRepo,
-            IOrderRepo orderRepo
+            IOrderRepo orderRepo,
             AccessControlService accessControlService)
         {
             _monsterRepo = monsterRepo;

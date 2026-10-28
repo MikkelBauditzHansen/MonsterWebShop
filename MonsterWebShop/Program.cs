@@ -21,7 +21,10 @@ namespace MonsterWebShop
             builder.Services.AddScoped<PasswordHasher>();
             builder.Services.AddScoped<PasswordPolicy>();
             builder.Services.AddScoped<EmailService>();
+            builder.Services.AddScoped<CartCookieService>();
+            builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession();
+
 
 
             var app = builder.Build();

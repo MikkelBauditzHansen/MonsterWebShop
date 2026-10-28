@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MonsterWebShop.Services;
@@ -8,10 +9,14 @@ namespace MonsterWebShop.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly AccountService accountService;
+        private readonly CartCookieService cartCookieService;
 
-        public LoginModel(AccountService accountService)
+        public LoginModel(
+            AccountService accountService,
+            CartCookieService cartCookieService)
         {
             this.accountService = accountService;
+            this.cartCookieService = cartCookieService;
         }
 
         [BindProperty]
@@ -28,16 +33,36 @@ namespace MonsterWebShop.Pages.Account
 
         public IActionResult OnPost()
         {
-            MonsterWebShop.Models.Account? account = accountService.Login(Username, Password);
+            MonsterWebShop.Models.Account? account =
+                accountService.Login(Username, Password);
 
             if (account == null)
             {
-                Message = "Forkert brugernavn eller adgangskode.";
+                Message =
+                    "Forkert brugernavn eller adgangskode.";
+
                 return Page();
             }
-            HttpContext.Session.SetInt32("AccountID", account.Id);
-            HttpContext.Session.SetString("Username", account.Username);
-            HttpContext.Session.SetString("Role", account.Role);
+
+            // Fjern tidligere brugers Session
+            HttpContext.Session.Clear();
+
+            // Gem oplysninger for den nye bruger
+            HttpContext.Session.SetInt32(
+                "AccountID",
+                account.Id);
+
+            HttpContext.Session.SetString(
+                "Username",
+                account.Username ?? "");
+
+            HttpContext.Session.SetString(
+                "Role",
+                account.Role ?? "");
+
+            // Gendan kun denne brugers kurv
+            cartCookieService.GetCart(HttpContext);
+
             return RedirectToPage("/Index");
         }
     }

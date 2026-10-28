@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MonsterWebShop.Models;
@@ -9,6 +10,8 @@ namespace MonsterWebShop.Pages
     public class ProductsModel : PageModel
     {
         private readonly MonsterService _monsterService;
+        private readonly CartCookieService _cartCookieService;
+
         private readonly AccessControlService _accessControl;
         public ProductsModel(MonsterService monsterService, AccessControlService accessControlService)
         {
@@ -26,6 +29,15 @@ namespace MonsterWebShop.Pages
 
         public int CartCount { get; set; }
 
+        public ProductsModel(
+            MonsterService monsterService,
+            CartCookieService cartCookieService)
+        {
+            _monsterService = monsterService;
+            _cartCookieService = cartCookieService;
+        }
+
+        // Vis produkter og antal i kurven
         public void OnGet()
         {
             Monsters =
@@ -34,68 +46,88 @@ namespace MonsterWebShop.Pages
                     MonsterType
                 );
 
-            string? cartJson =
-                HttpContext.Session.GetString("Cart");
+            List<int> cart = GetCart();
 
-            if (string.IsNullOrEmpty(cartJson))
-            {
-                CartCount = 0;
-                return;
-            }
-
-            try
-            {
-                List<int> cart =
-                    JsonSerializer.Deserialize<List<int>>(cartJson)
-                    ?? new List<int>();
-
-                CartCount = cart.Count;
-            }
-            catch
-            {
-                HttpContext.Session.Remove("Cart");
-                CartCount = 0;
-            }
+            CartCount = cart.Count;
         }
-        
-        public IActionResult OnPostAddToCart(
-            int monsterId)
+
+        // Tilføj monster til kurven
+        public IActionResult OnPostAddToCart(int monsterId)
+        {
+            // Kontroller at monsteret findes
+            Monster? monster =
+                _monsterService.GetMonsterById(monsterId);
+
+            if (monster == null)
+            {
+                return NotFound();
+            }
+
+            // Hent kurven fra Session eller cookie
+            List<int> cart = GetCart();
+
+            // Tilføj monsteret
+            cart.Add(monsterId);
+
+            // Gem både i Session og cookie
+            SaveCart(cart);
+
+            return RedirectToPage();
+        }
+
+        // Hent kurven fra Session eller cookie
+        private List<int> GetCart()
         {
             string? cartJson =
                 HttpContext.Session.GetString("Cart");
 
-            List<int> cart;
-
-            if (string.IsNullOrEmpty(cartJson))
-            {
-                cart = new List<int>();
-            }
-            else
+            if (!string.IsNullOrEmpty(cartJson))
             {
                 try
                 {
-                    cart =
-                        JsonSerializer.Deserialize<List<int>>(cartJson)
-                        ?? new List<int>();
+                    List<int>? cart =
+                        JsonSerializer.Deserialize<List<int>>(cartJson);
+
+                    return cart ?? new List<int>();
                 }
                 catch
                 {
-                    cart = new List<int>();
+                    // Hvis Session er ugyldig,
+                    // forsøger vi at hente fra cookie
                 }
             }
 
-            cart.Add(monsterId);
+            // Hent den gemte kurv fra cookie
+            List<int> cookieCart =
+                _cartCookieService.GetCart(HttpContext);
 
+            // Gendan kurven i Session
+            HttpContext.Session.SetString(
+                "Cart",
+                JsonSerializer.Serialize(cookieCart)
+            );
+
+            return cookieCart;
+        }
+
+        // Gem kurven i både Session og cookie
+        private void SaveCart(List<int> cart)
+        {
+            // Gem i Session
             HttpContext.Session.SetString(
                 "Cart",
                 JsonSerializer.Serialize(cart)
             );
 
-            return RedirectToPage();
+            // Gem i cookie i 30 dage
+            _cartCookieService.SaveCart(
+                HttpContext,
+                cart
+            );
         }
 
-        public IActionResult OnPostDelete(
-            int monsterId)
+        // Slet monster fra webshoppen
+        public IActionResult OnPostDelete(int monsterId)
         {
             int? accountId = HttpContext.Session.GetInt32("AccountID");
             string? role = HttpContext.Session.GetString("Role");
@@ -116,6 +148,7 @@ namespace MonsterWebShop.Pages
             return RedirectToPage();
         }
 
+        // Rediger monster
         public IActionResult OnPostEdit(
             int monsterId,
             string name,
@@ -159,7 +192,8 @@ namespace MonsterWebShop.Pages
                 !double.IsFinite(price) ||
                 price < 0)
             {
-                return BadRequest("Ugyldige monsteroplysninger.");
+                return BadRequest(
+                    "Ugyldige monsteroplysninger.");
             }
 
             // Opdater fælles oplysninger
@@ -168,7 +202,7 @@ namespace MonsterWebShop.Pages
             monster.Age = age;
             monster.Price = price;
 
-            // Opdater oplysninger for monstertypen
+            // Opdater oplysninger for Dragon
             if (monster is Dragon dragon)
             {
                 if (wingSpan == null ||
@@ -179,12 +213,16 @@ namespace MonsterWebShop.Pages
                         typeof(DragonType),
                         monsterSubtype.Value))
                 {
-                    return BadRequest("Ugyldige dragon-oplysninger.");
+                    return BadRequest(
+                        "Ugyldige dragon-oplysninger.");
                 }
 
                 dragon.WingSpan = wingSpan.Value;
-                dragon.Type = (DragonType)monsterSubtype.Value;
+                dragon.Type =
+                    (DragonType)monsterSubtype.Value;
             }
+
+            // Opdater oplysninger for Humanoid
             else if (monster is Humanoid humanoid)
             {
                 if (monsterSubtype == null ||
@@ -192,11 +230,15 @@ namespace MonsterWebShop.Pages
                         typeof(HumanoidType),
                         monsterSubtype.Value))
                 {
-                    return BadRequest("Ugyldig humanoid-type.");
+                    return BadRequest(
+                        "Ugyldig humanoid-type.");
                 }
 
-                humanoid.Type = (HumanoidType)monsterSubtype.Value;
+                humanoid.Type =
+                    (HumanoidType)monsterSubtype.Value;
             }
+
+            // Opdater oplysninger for Undead
             else if (monster is Undead undead)
             {
                 if (monsterSubtype == null ||
@@ -204,40 +246,56 @@ namespace MonsterWebShop.Pages
                         typeof(UndeadType),
                         monsterSubtype.Value))
                 {
-                    return BadRequest("Ugyldig undead-type.");
+                    return BadRequest(
+                        "Ugyldig undead-type.");
                 }
 
-                undead.Type = (UndeadType)monsterSubtype.Value;
+                undead.Type =
+                    (UndeadType)monsterSubtype.Value;
             }
 
+            // Upload nyt billede
             if (newImage != null && newImage.Length > 0)
             {
                 // Maksimal filstørrelse: 5 MB
                 if (newImage.Length > 5 * 1024 * 1024)
                 {
-                    return BadRequest("Billedet må højst fylde 5 MB.");
+                    return BadRequest(
+                        "Billedet må højst fylde 5 MB.");
                 }
 
                 // Kontrollér filtypen
                 string extension =
-                    Path.GetExtension(newImage.FileName).ToLowerInvariant();
+                    Path.GetExtension(
+                        newImage.FileName
+                    ).ToLowerInvariant();
 
                 string[] allowedExtensions =
                 {
-        ".jpg", ".jpeg", ".png", ".webp"
-    };
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".webp"
+                };
 
                 if (!allowedExtensions.Contains(extension))
                 {
-                    return BadRequest("Kun JPG, PNG og WebP er tilladt.");
+                    return BadRequest(
+                        "Kun JPG, PNG og WebP er tilladt.");
                 }
 
-                // Kontrollér filens faktiske format via signatur
+                // Kontrollér billedets faktiske format
                 byte[] header = new byte[12];
 
-                using (Stream stream = newImage.OpenReadStream())
+                using (Stream stream =
+                       newImage.OpenReadStream())
                 {
-                    int bytesRead = stream.Read(header, 0, header.Length);
+                    int bytesRead =
+                        stream.Read(
+                            header,
+                            0,
+                            header.Length
+                        );
 
                     bool isJpeg =
                         bytesRead >= 3 &&
@@ -248,12 +306,18 @@ namespace MonsterWebShop.Pages
                     bool isPng =
                         bytesRead >= 8 &&
                         header.AsSpan(0, 8).SequenceEqual(
-                            new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 });
+                            new byte[]
+                            {
+                                137, 80, 78, 71,
+                                13, 10, 26, 10
+                            });
 
                     bool isWebp =
                         bytesRead >= 12 &&
-                        System.Text.Encoding.ASCII.GetString(header, 0, 4) == "RIFF" &&
-                        System.Text.Encoding.ASCII.GetString(header, 8, 4) == "WEBP";
+                        System.Text.Encoding.ASCII
+                            .GetString(header, 0, 4) == "RIFF" &&
+                        System.Text.Encoding.ASCII
+                            .GetString(header, 8, 4) == "WEBP";
 
                     bool validFormat = extension switch
                     {
@@ -265,7 +329,8 @@ namespace MonsterWebShop.Pages
 
                     if (!validFormat)
                     {
-                        return BadRequest("Billedfilens format er ugyldigt.");
+                        return BadRequest(
+                            "Billedfilens format er ugyldigt.");
                     }
                 }
 
@@ -281,28 +346,36 @@ namespace MonsterWebShop.Pages
 
                 // Generér et unikt filnavn
                 string fileName =
-                    Guid.NewGuid().ToString("N") + extension;
+                    Guid.NewGuid().ToString("N") +
+                    extension;
 
                 string filePath =
-                    Path.Combine(uploadFolder, fileName);
+                    Path.Combine(
+                        uploadFolder,
+                        fileName
+                    );
 
                 // Gem billedet
                 using (FileStream fileStream =
-                       new FileStream(filePath, FileMode.CreateNew))
+                       new FileStream(
+                           filePath,
+                           FileMode.CreateNew))
                 {
                     newImage.CopyTo(fileStream);
                 }
 
-                // Opdater billedstien på monsteret
-                monster.ImagePath = "/uploads/monsters/" + fileName;
+                // Opdater billedstien
+                monster.ImagePath =
+                    "/uploads/monsters/" + fileName;
             }
 
-
             // Gem ændringerne i databasen
-            _monsterService.UpdateMonster(monsterId, monster);
+            _monsterService.UpdateMonster(
+                monsterId,
+                monster
+            );
 
             return RedirectToPage();
         }
-
     }
 }

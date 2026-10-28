@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MonsterWebShop.Models;
 using MonsterWebShop.Services;
-using System.Text.Json;
 
 namespace MonsterWebShop.Pages
 {
@@ -11,9 +10,12 @@ namespace MonsterWebShop.Pages
     {
         private readonly MonsterService _monsterService;
         private readonly CartCookieService _cartCookieService;
-
         private readonly AccessControlService _accessControl;
-        public ProductsModel(MonsterService monsterService, AccessControlService accessControlService, CartCookieService cartCookieService)
+
+        public ProductsModel(
+            MonsterService monsterService,
+            AccessControlService accessControlService,
+            CartCookieService cartCookieService)
         {
             _monsterService = monsterService;
             _accessControl = accessControlService;
@@ -30,18 +32,16 @@ namespace MonsterWebShop.Pages
 
         public int CartCount { get; set; }
 
-       
-
         // Vis produkter og antal i kurven
         public void OnGet()
         {
-            Monsters =
-                _monsterService.SearchAndFilter(
-                    SearchText,
-                    MonsterType
-                );
+            Monsters = _monsterService.SearchAndFilter(
+                SearchText,
+                MonsterType);
 
-            List<int> cart = GetCart();
+            // Hent kun den aktuelle brugers kurv
+            List<int> cart =
+                _cartCookieService.GetCart(HttpContext);
 
             CartCount = cart.Count;
         }
@@ -49,6 +49,15 @@ namespace MonsterWebShop.Pages
         // Tilføj monster til kurven
         public IActionResult OnPostAddToCart(int monsterId)
         {
+            // Kontroller at brugeren er logget ind
+            int? accountId =
+                HttpContext.Session.GetInt32("AccountID");
+
+            if (accountId == null)
+            {
+                return RedirectToPage("/Account/Login");
+            }
+
             // Kontroller at monsteret findes
             Monster? monster =
                 _monsterService.GetMonsterById(monsterId);
@@ -58,74 +67,35 @@ namespace MonsterWebShop.Pages
                 return NotFound();
             }
 
-            // Hent kurven fra Session eller cookie
-            List<int> cart = GetCart();
+            // Hent den aktuelle brugers kurv
+            List<int> cart =
+                _cartCookieService.GetCart(HttpContext);
+
+            // Maksimalt 100 produkter
+            if (cart.Count >= 100)
+            {
+                return BadRequest("Kurven er fuld.");
+            }
 
             // Tilføj monsteret
             cart.Add(monsterId);
 
-            // Gem både i Session og cookie
-            SaveCart(cart);
-
-            return RedirectToPage();
-        }
-
-        // Hent kurven fra Session eller cookie
-        private List<int> GetCart()
-        {
-            string? cartJson =
-                HttpContext.Session.GetString("Cart");
-
-            if (!string.IsNullOrEmpty(cartJson))
-            {
-                try
-                {
-                    List<int>? cart =
-                        JsonSerializer.Deserialize<List<int>>(cartJson);
-
-                    return cart ?? new List<int>();
-                }
-                catch
-                {
-                    // Hvis Session er ugyldig,
-                    // forsøger vi at hente fra cookie
-                }
-            }
-
-            // Hent den gemte kurv fra cookie
-            List<int> cookieCart =
-                _cartCookieService.GetCart(HttpContext);
-
-            // Gendan kurven i Session
-            HttpContext.Session.SetString(
-                "Cart",
-                JsonSerializer.Serialize(cookieCart)
-            );
-
-            return cookieCart;
-        }
-
-        // Gem kurven i både Session og cookie
-        private void SaveCart(List<int> cart)
-        {
-            // Gem i Session
-            HttpContext.Session.SetString(
-                "Cart",
-                JsonSerializer.Serialize(cart)
-            );
-
-            // Gem i cookie i 30 dage
+            // Gem i både Session og brugerens cookie
             _cartCookieService.SaveCart(
                 HttpContext,
-                cart
-            );
+                cart);
+
+            return RedirectToPage();
         }
 
         // Slet monster fra webshoppen
         public IActionResult OnPostDelete(int monsterId)
         {
-            int? accountId = HttpContext.Session.GetInt32("AccountID");
-            string? role = HttpContext.Session.GetString("Role");
+            int? accountId =
+                HttpContext.Session.GetInt32("AccountID");
+
+            string? role =
+                HttpContext.Session.GetString("Role");
 
             if (accountId == null ||
                 !_accessControl.CanManageMonsters(role))
@@ -155,8 +125,11 @@ namespace MonsterWebShop.Pages
             IFormFile? newImage)
         {
             // Kun administratorer må redigere
-            int? accountId = HttpContext.Session.GetInt32("AccountID");
-            string? role = HttpContext.Session.GetString("Role");
+            int? accountId =
+                HttpContext.Session.GetInt32("AccountID");
+
+            string? role =
+                HttpContext.Session.GetString("Role");
 
             if (accountId == null ||
                 !_accessControl.CanManageMonsters(role))
@@ -209,7 +182,7 @@ namespace MonsterWebShop.Pages
                         monsterSubtype.Value))
                 {
                     return BadRequest(
-                        "Ugyldige dragon-oplysninger.");
+                        "Ugyldige dragonoplysninger.");
                 }
 
                 dragon.WingSpan = wingSpan.Value;
@@ -226,7 +199,7 @@ namespace MonsterWebShop.Pages
                         monsterSubtype.Value))
                 {
                     return BadRequest(
-                        "Ugyldig humanoid-type.");
+                        "Ugyldig humanoidtype.");
                 }
 
                 humanoid.Type =
@@ -242,7 +215,7 @@ namespace MonsterWebShop.Pages
                         monsterSubtype.Value))
                 {
                     return BadRequest(
-                        "Ugyldig undead-type.");
+                        "Ugyldig undeadtype.");
                 }
 
                 undead.Type =
@@ -259,7 +232,7 @@ namespace MonsterWebShop.Pages
                         "Billedet må højst fylde 5 MB.");
                 }
 
-                // Kontrollér filtypen
+                // Kontroller filtypen
                 string extension =
                     Path.GetExtension(
                         newImage.FileName
@@ -279,7 +252,7 @@ namespace MonsterWebShop.Pages
                         "Kun JPG, PNG og WebP er tilladt.");
                 }
 
-                // Kontrollér billedets faktiske format
+                // Kontroller billedets faktiske format
                 byte[] header = new byte[12];
 
                 using (Stream stream =
@@ -339,7 +312,7 @@ namespace MonsterWebShop.Pages
 
                 Directory.CreateDirectory(uploadFolder);
 
-                // Generér et unikt filnavn
+                // Generer et unikt filnavn
                 string fileName =
                     Guid.NewGuid().ToString("N") +
                     extension;

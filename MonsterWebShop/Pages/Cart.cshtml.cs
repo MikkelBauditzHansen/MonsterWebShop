@@ -12,6 +12,7 @@ namespace MonsterWebShop.Pages
     {
         private readonly IMonsterRepo _monsterRepo;
         private readonly CartCookieService _cartCookieService;
+        private readonly AccessControlService _accessControl;
 
         public List<Monster> MonstersInCart { get; set; } = new();
 
@@ -23,15 +24,27 @@ namespace MonsterWebShop.Pages
 
         public CartModel(
             IMonsterRepo monsterRepo,
-            CartCookieService cartCookieService)
+            CartCookieService cartCookieService,
+            AccessControlService accessControlService)
         {
             _monsterRepo = monsterRepo;
             _cartCookieService = cartCookieService;
+            _accessControl = accessControlService;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            int? accountId = HttpContext.Session.GetInt32("AccountID");
+            string? role = HttpContext.Session.GetString("Role");
+
+            if (accountId == null ||
+                !_accessControl.CanAddToCart(role))
+            {
+                return StatusCode(403);
+            }
+
             LoadCart();
+            return Page();
         }
 
         public IActionResult OnPostRemove(int monsterId)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MonsterWebShop.Models;
 using MonsterWebShop.Repo;
+using MonsterWebShop.Services;
 using System.Text.Json;
 
 namespace MonsterWebShop.Pages
@@ -11,13 +12,16 @@ namespace MonsterWebShop.Pages
     {
         private readonly IMonsterRepo _monsterRepo;
         private readonly IOrderRepo _orderRepo;
+        private readonly AccessControlService _accessControl;
 
         public CheckoutModel(
             IMonsterRepo monsterRepo,
-            IOrderRepo orderRepo)
+            IOrderRepo orderRepo
+            AccessControlService accessControlService)
         {
             _monsterRepo = monsterRepo;
             _orderRepo = orderRepo;
+            _accessControl = accessControlService;
         }
 
         public List<Monster> MonstersInCart { get; set; } = new();
@@ -28,6 +32,14 @@ namespace MonsterWebShop.Pages
 
         public IActionResult OnGet()
         {
+            int? accountId = HttpContext.Session.GetInt32("AccountID");
+            string? role = HttpContext.Session.GetString("Role");
+
+            if (accountId == null ||
+                !_accessControl.CanCheckout(role))
+            {
+                return StatusCode(403);
+            }
             if (HttpContext.Session.GetInt32("AccountID") == null)
                 return RedirectToPage("/Account/Login");
 
@@ -48,8 +60,15 @@ namespace MonsterWebShop.Pages
 
         public IActionResult OnPost()
         {
-            int? accountId =
-                HttpContext.Session.GetInt32("AccountID");
+            int? accountId = HttpContext.Session.GetInt32("AccountID");
+            string? role = HttpContext.Session.GetString("Role");
+
+            if (accountId == null ||
+                !_accessControl.CanCheckout(role))
+            {
+                return StatusCode(403);
+            }
+            
 
             if (accountId == null)
                 return RedirectToPage("/Account/Login");

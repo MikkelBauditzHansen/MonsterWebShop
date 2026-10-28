@@ -9,10 +9,11 @@ namespace MonsterWebShop.Pages
     public class ProductsModel : PageModel
     {
         private readonly MonsterService _monsterService;
-
-        public ProductsModel(MonsterService monsterService)
+        private readonly AccessControlService _accessControl;
+        public ProductsModel(MonsterService monsterService, AccessControlService accessControlService)
         {
             _monsterService = monsterService;
+            _accessControl = accessControlService;
         }
 
         public List<Monster> Monsters { get; set; } = new();
@@ -96,8 +97,14 @@ namespace MonsterWebShop.Pages
         public IActionResult OnPostDelete(
             int monsterId)
         {
-            string? role =
-                HttpContext.Session.GetString("Role");
+            int? accountId = HttpContext.Session.GetInt32("AccountID");
+            string? role = HttpContext.Session.GetString("Role");
+
+            if (accountId == null ||
+                !_accessControl.CanManageMonsters(role))
+            {
+                return StatusCode(403);
+            }
 
             if (role != "Admin")
             {
@@ -120,8 +127,14 @@ namespace MonsterWebShop.Pages
             IFormFile? newImage)
         {
             // Kun administratorer må redigere
-            string? role = HttpContext.Session.GetString("Role");
             int? accountId = HttpContext.Session.GetInt32("AccountID");
+            string? role = HttpContext.Session.GetString("Role");
+
+            if (accountId == null ||
+                !_accessControl.CanManageMonsters(role))
+            {
+                return StatusCode(403);
+            }
 
             if (accountId == null || role != "Admin")
             {

@@ -1,13 +1,23 @@
-﻿@page
+﻿
+@page
 @using MonsterWebShop.Models
 @model MonsterWebShop.Pages.ProductsModel
-
+@inject MonsterWebShop.Services.AccessControlService AccessControl
 @{
     ViewData["Title"] = "Monstre";
 
-    string role = HttpContext.Session.GetString("Role");
+    // string role = HttpContext.Session.GetString("Role");
+    // int? accountId = HttpContext.Session.GetInt32("AccountID");
     int? accountId = HttpContext.Session.GetInt32("AccountID");
+    string? role = HttpContext.Session.GetString("Role");
+
+    bool isAdmin = accountId != null &&
+        AccessControl.CanManageMonsters(role);
+
+    bool canAddToCart = accountId != null &&
+        AccessControl.CanAddToCart(role);
 }
+
 
 <div class="container mt-4">
 
@@ -54,15 +64,16 @@
                         Søg i vores udvalg eller vælg en monstertype.
                     </p>
                 </div>
+                @if (canAddToCart)
+                {
+                    <a asp-page="/Cart"
+                    class="btn btn-secondary btn-capsul">
 
-                <a asp-page="/Cart"
-                   class="btn btn-secondary btn-capsul">
+                        <i class="fa fa-shopping-cart me-2"></i>
+                        Shopping cart (@Model.CartCount)
 
-                    <i class="fa fa-shopping-cart me-2"></i>
-                    Shopping cart (@Model.CartCount)
-
-                </a>
-
+                    </a>
+                }
             </div>
 
 
@@ -211,23 +222,24 @@
                             </p>
 
                             <div class="mt-auto">
+                                @if (canAddToCart)
+                                {
+                                    <form method="post"
+                                          asp-page-handler="AddToCart">
 
-                                <form method="post"
-                                      asp-page-handler="AddToCart">
+                                        <input type="hidden"
+                                               name="monsterId"
+                                               value="@monster.Id" />
 
-                                    <input type="hidden"
-                                           name="monsterId"
-                                           value="@monster.Id" />
+                                        <button type="submit"
+                                                class="btn btn-primary btn-capsul">
+                                            <i class="fa fa-shopping-cart me-1"></i>
+                                            Tilføj til kurv
+                                        </button>
 
-                                    <button type="submit"
-                                            class="btn btn-primary btn-capsul">
-                                        <i class="fa fa-shopping-cart me-1"></i>
-                                        Tilføj til kurv
-                                    </button>
-
-                                </form>
-
-                                @if (role == "Admin")
+                                    </form>
+                                }
+                                @if (isAdmin)
                                 {
                                     <button type="button"
                                             class="btn btn-outline-secondary btn-capsul mt-2"

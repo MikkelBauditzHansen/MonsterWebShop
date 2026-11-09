@@ -1,12 +1,17 @@
 ﻿namespace MonsterWebShop.Models
 {
-    public class log
+    public class Log
     {
-        public string IPAddres { set; get; }
-        public DateTime When { set; get; }
+        public int LogID { get; set; }
 
-        public string WhatHappened { set; get; }
+        public string IPAddress { get; set; } = string.Empty;
 
+        public DateTime WhatTime { get; set; }
 
+        public string? WhatHappened { get; set; }
+
+        public string? SessionID { get; set; }
+
+        public string? IncidentType { get; set; }
     }
 }

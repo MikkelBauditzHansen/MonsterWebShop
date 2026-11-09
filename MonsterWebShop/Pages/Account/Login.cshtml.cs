@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MonsterWebShop.Services;
@@ -33,8 +32,11 @@ namespace MonsterWebShop.Pages.Account
 
         public IActionResult OnPost()
         {
+            // Get the user's IP address
+            string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+
             MonsterWebShop.Models.Account? account =
-                accountService.Login(Username, Password);
+                accountService.Login(Username, Password, ip);
 
             if (account == null)
             {

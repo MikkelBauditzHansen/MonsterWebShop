@@ -1,6 +1,5 @@
 ﻿using MonsterWebShop.Models;
 using MonsterWebShop.Repo;
-using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace MonsterWebShop.Services
@@ -9,13 +8,16 @@ namespace MonsterWebShop.Services
     {
         private readonly IAccountRepo accountRepo;
         private readonly PasswordHasher passwordHasher;
+        private readonly ILogRepo logRepo;
 
         public AccountService(
             IAccountRepo accountRepo,
-            PasswordHasher passwordHasher)
+            PasswordHasher passwordHasher,
+            ILogRepo logRepo)
         {
             this.accountRepo = accountRepo;
             this.passwordHasher = passwordHasher;
+            this.logRepo = logRepo;
         }
 
         public bool ResetPassword(
@@ -105,10 +107,10 @@ namespace MonsterWebShop.Services
         }
 
         public bool Register(
-    string username,
-    string email,
-    string password,
-    string role)
+            string username,
+            string email,
+            string password,
+            string role)
         {
             Account? existingAccount =
                 accountRepo.GetAccountByUsername(username);
@@ -222,14 +224,15 @@ namespace MonsterWebShop.Services
         public Account? Login(
             string username,
             string password,
-            string ip)
+            string ip,
+            string? sessionId = null)
         {
-            Debug.WriteLine($"ip is {ip}");
             Account? account =
                 accountRepo.GetAccountByUsername(username);
 
             if (account == null)
             {
+                LogLogin(ip, username, false, sessionId);
                 return null;
             }
 
@@ -241,15 +244,50 @@ namespace MonsterWebShop.Services
 
             if (!passwordCorrect)
             {
+                LogLogin(ip, username, false, sessionId);
                 return null;
             }
+
+            LogLogin(ip, username, true, sessionId);
 
             return account;
         }
 
-        private void LogLogin()
+        private void LogLogin(
+            string ip,
+            string username,
+            bool success,
+            string? sessionId)
         {
+            try
+            {
+                string description = success
+                    ? $"Succesfuldt login for '{username}'"
+                    : $"Mislykket login for '{username}'";
 
+                if (description.Length > 255)
+                {
+                    description = description.Substring(0, 255);
+                }
+
+                Log log = new Log
+                {
+                    IPAddress = string.IsNullOrWhiteSpace(ip)
+                        ? "unknown"
+                        : ip,
+                    WhatHappened = description,
+                    SessionID = sessionId,
+                    IncidentType = success
+                        ? "LoginSuccess"
+                        : "LoginFailed"
+                };
+
+                logRepo.CreateLog(log);
+            }
+            catch
+            {
+                
+            }
         }
 
     }

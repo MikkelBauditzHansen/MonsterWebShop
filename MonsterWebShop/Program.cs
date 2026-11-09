@@ -17,6 +17,7 @@ namespace MonsterWebShop
             builder.Services.AddScoped<MonsterService>();
             builder.Services.AddScoped<IOrderRepo>(provider => new OrderRepoDB(connectionString));
             builder.Services.AddScoped<IAccountRepo>(provider => new AccountRepo(connectionString));
+            builder.Services.AddScoped<ILogRepo>(provider => new LogRepoDB(connectionString));
             builder.Services.AddScoped<AccountService>();
             builder.Services.AddScoped<AccessControlService>();
             builder.Services.AddScoped<OrderAccessService>();

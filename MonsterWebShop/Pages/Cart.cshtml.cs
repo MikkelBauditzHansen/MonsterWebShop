@@ -1,14 +1,16 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MonsterWebShop.Models;
 using MonsterWebShop.Repo;
-using System.Text.Json;
+using MonsterWebShop.Services;
 
 namespace MonsterWebShop.Pages
 {
     public class CartModel : PageModel
     {
         private readonly IMonsterRepo _monsterRepo;
+        private readonly CartCookieService _cartCookieService;
 
         public List<Monster> MonstersInCart { get; set; } = new();
 
@@ -18,9 +20,12 @@ namespace MonsterWebShop.Pages
 
         public double Total { get; set; }
 
-        public CartModel(IMonsterRepo monsterRepo)
+        public CartModel(
+            IMonsterRepo monsterRepo,
+            CartCookieService cartCookieService)
         {
             _monsterRepo = monsterRepo;
+            _cartCookieService = cartCookieService;
         }
 
         public void OnGet()
@@ -30,50 +35,41 @@ namespace MonsterWebShop.Pages
 
         public IActionResult OnPostRemove(int monsterId)
         {
-            var cartJson = HttpContext.Session.GetString("Cart");
-
-            if (cartJson != null)
+            if (HttpContext.Session.GetInt32("AccountID") == null)
             {
-                var cart = JsonSerializer.Deserialize<List<int>>(cartJson)
-                           ?? new List<int>();
-
-                cart.Remove(monsterId);
-
-                HttpContext.Session.SetString(
-                    "Cart",
-                    JsonSerializer.Serialize(cart)
-                );
+                return RedirectToPage("/Account/Login");
             }
+
+            List<int> cart =
+                _cartCookieService.GetCart(HttpContext);
+
+            cart.Remove(monsterId);
+
+            _cartCookieService.SaveCart(
+                HttpContext,
+                cart);
 
             return RedirectToPage();
         }
 
         private void LoadCart()
         {
-            var cartJson = HttpContext.Session.GetString("Cart");
+            List<int> cart =
+                _cartCookieService.GetCart(HttpContext);
 
-            if (cartJson == null)
+            foreach (int id in cart)
             {
-                return;
-            }
-
-            var cart = JsonSerializer.Deserialize<List<int>>(cartJson)
-                       ?? new List<int>();
-
-            foreach (var id in cart)
-            {
-                var monster = _monsterRepo.GetMonsterById(id);
+                Monster? monster =
+                    _monsterRepo.GetMonsterById(id);
 
                 if (monster != null)
                 {
                     MonstersInCart.Add(monster);
 
-                    // Læg monsterets pris til subtotal
                     Subtotal += monster.Price;
                 }
             }
 
-            // Eksempel: gratis levering
             Shipping = 0;
 
             Total = Subtotal + Shipping;

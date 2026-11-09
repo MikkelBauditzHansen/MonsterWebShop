@@ -15,16 +15,6 @@ namespace MonsterWebShop.Pages
 
         public List<Order> Orders { get; set; } = new();
 
-        public ProfileModel(
-    IAccountRepo accountRepo,
-    AccountService accountService,
-    IOrderRepo orderRepo)
-        {
-            _accountRepo = accountRepo;
-            _accountService = accountService;
-            _orderRepo = orderRepo;
-        }
-
         public Models.Account Account { get; set; } = null!;
 
         [BindProperty]
@@ -39,6 +29,16 @@ namespace MonsterWebShop.Pages
         public string Message { get; set; } = "";
 
         public bool PasswordChanged { get; set; }
+
+        public ProfileModel(
+            IAccountRepo accountRepo,
+            AccountService accountService,
+            IOrderRepo orderRepo)
+        {
+            _accountRepo = accountRepo;
+            _accountService = accountService;
+            _orderRepo = orderRepo;
+        }
 
         public IActionResult OnGet()
         {
@@ -60,7 +60,8 @@ namespace MonsterWebShop.Pages
 
             Account = account;
 
-            Orders = _orderRepo.GetOrdersByAccountId(accountId.Value);
+            Orders = _orderRepo.GetOrdersByAccountId(
+                accountId.Value);
 
             return Page();
         }
@@ -85,6 +86,17 @@ namespace MonsterWebShop.Pages
 
             Account = account;
 
+            // Kun kunder må ændre adgangskode
+            if (account.Role != "Customer")
+            {
+                return Forbid();
+            }
+
+            // Hent ordrer, så profilsiden stadig kan vises
+            Orders = _orderRepo.GetOrdersByAccountId(
+                accountId.Value);
+
+            // Kontroller at alle felter er udfyldt
             if (string.IsNullOrWhiteSpace(CurrentPassword) ||
                 string.IsNullOrWhiteSpace(NewPassword) ||
                 string.IsNullOrWhiteSpace(RepeatPassword))
@@ -93,12 +105,14 @@ namespace MonsterWebShop.Pages
                 return Page();
             }
 
+            // Kontroller at de nye adgangskoder er ens
             if (NewPassword != RepeatPassword)
             {
                 Message = "De nye adgangskoder er ikke ens.";
                 return Page();
             }
 
+            // Forsøg at ændre adgangskoden
             bool success = _accountService.ChangePassword(
                 accountId.Value,
                 CurrentPassword,

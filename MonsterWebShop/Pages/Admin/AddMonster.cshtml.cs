@@ -8,10 +8,12 @@ namespace MonsterWebShop.Pages.Admin
     public class AddMonsterModel : PageModel
     {
         private readonly MonsterService _monsterService;
+        private readonly AccessControlService _accessControl;
 
-        public AddMonsterModel(MonsterService monsterService)
+        public AddMonsterModel(MonsterService monsterService, AccessControlService accessControl)
         {
             _monsterService = monsterService;
+            _accessControl = accessControl;
         }
 
 
@@ -57,11 +59,13 @@ namespace MonsterWebShop.Pages.Admin
 
         public IActionResult OnGet()
         {
+            int? accountId = HttpContext.Session.GetInt32("AccountID");
             string? role = HttpContext.Session.GetString("Role");
 
-            if (role != "Admin")
+            if (accountId == null ||
+                !_accessControl.CanManageMonsters(role))
             {
-                return RedirectToPage("/Products");
+                return StatusCode(403);
             }
 
             return Page();
@@ -70,15 +74,19 @@ namespace MonsterWebShop.Pages.Admin
 
         public IActionResult OnPost()
         {
-            // Tjek at brugeren stadig er administrator
+            int? accountId = HttpContext.Session.GetInt32("AccountID");
             string? role = HttpContext.Session.GetString("Role");
 
-            // Hvis du vil aktivere admin-tjekket igen:
-            // if (role != "Admin")
-            // {
-            //     return RedirectToPage("/Index");
-            // }
+            if (accountId == null ||
+                !_accessControl.CanManageMonsters(role))
+            {
+                return StatusCode(403);
+            }
 
+            if (accountId == null || role != "Admin")
+            {
+                return RedirectToPage("/Products");
+            }
 
             string imagePath = "";
 

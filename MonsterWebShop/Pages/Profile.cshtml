@@ -101,7 +101,7 @@
     <h1 class="profile-title">Min Profil</h1>
 
     <p class="profile-subtitle">
-        Administrer dine kontooplysninger, din adgangskode og dine ordrer.
+        Administrer dine kontooplysninger og dine ordrer.
     </p>
 
     <div class="row g-4">
@@ -135,14 +135,20 @@
                 </div>
 
                 <div class="mb-3">
-                    <div class="profile-label">Brugernavn</div>
+                    <div class="profile-label">
+                        Brugernavn
+                    </div>
+
                     <div class="profile-value">
                         @Model.Account.Username
                     </div>
                 </div>
 
                 <div>
-                    <div class="profile-label">E-mail</div>
+                    <div class="profile-label">
+                        E-mail
+                    </div>
+
                     <div class="profile-value">
                         @Model.Account.Email
                     </div>
@@ -150,78 +156,90 @@
 
             </div>
 
-            <!-- Skift adgangskode -->
-            <div class="profile-card">
+            @* Kun Customer kan se og bruge denne formular *@
+            @if (Model.Account.Role == "Customer")
+            {
+                <!-- Skift adgangskode -->
+                <div class="profile-card">
 
-                <h2 class="profile-card-title">
-                    Skift adgangskode
-                </h2>
+                    <h2 class="profile-card-title">
+                        Skift adgangskode
+                    </h2>
 
-                @if (TempData["PasswordSuccess"] != null)
-                {
-                    <div class="alert alert-success">
-                        @TempData["PasswordSuccess"]
-                    </div>
-                }
+                    @if (TempData["PasswordSuccess"] != null)
+                    {
+                        <div class="alert alert-success">
+                            @TempData["PasswordSuccess"]
+                        </div>
+                    }
 
-                @if (!string.IsNullOrEmpty(Model.Message))
-                {
-                    <div class="alert alert-danger">
-                        @Model.Message
-                    </div>
-                }
+                    @if (!string.IsNullOrEmpty(Model.Message))
+                    {
+                        <div class="alert alert-danger">
+                            @Model.Message
+                        </div>
+                    }
 
-                <form method="post"
-                      asp-page-handler="ChangePassword">
+                    <form method="post"
+                          asp-page-handler="ChangePassword">
 
-                    <div class="mb-3">
-                        <label asp-for="CurrentPassword"
-                               class="form-label">
-                            Nuværende adgangskode
-                        </label>
+                        <div class="mb-3">
 
-                        <input asp-for="CurrentPassword"
-                               type="password"
-                               class="form-control profile-input"
-                               autocomplete="current-password"
-                               required />
-                    </div>
+                            <label asp-for="CurrentPassword"
+                                   class="form-label">
+                                Nuværende adgangskode
+                            </label>
 
-                    <div class="mb-3">
-                        <label asp-for="NewPassword"
-                               class="form-label">
-                            Ny adgangskode
-                        </label>
+                            <input asp-for="CurrentPassword"
+                                   type="password"
+                                   class="form-control profile-input"
+                                   autocomplete="current-password"
+                                   required />
 
-                        <input asp-for="NewPassword"
-                               type="password"
-                               class="form-control profile-input"
-                               autocomplete="new-password"
-                               required />
-                    </div>
+                        </div>
 
-                    <div class="mb-4">
-                        <label asp-for="RepeatPassword"
-                               class="form-label">
-                            Bekræft ny adgangskode
-                        </label>
+                        <div class="mb-3">
 
-                        <input asp-for="RepeatPassword"
-                               type="password"
-                               class="form-control profile-input"
-                               autocomplete="new-password"
-                               required />
-                    </div>
+                            <label asp-for="NewPassword"
+                                   class="form-label">
+                                Ny adgangskode
+                            </label>
 
-                    <button type="submit"
-                            class="profile-button w-100">
-                        <i class="fa fa-lock me-2"></i>
-                        Opdater adgangskode
-                    </button>
+                            <input asp-for="NewPassword"
+                                   type="password"
+                                   class="form-control profile-input"
+                                   autocomplete="new-password"
+                                   required />
 
-                </form>
+                        </div>
 
-            </div>
+                        <div class="mb-4">
+
+                            <label asp-for="RepeatPassword"
+                                   class="form-label">
+                                Bekræft ny adgangskode
+                            </label>
+
+                            <input asp-for="RepeatPassword"
+                                   type="password"
+                                   class="form-control profile-input"
+                                   autocomplete="new-password"
+                                   required />
+
+                        </div>
+
+                        <button type="submit"
+                                class="profile-button w-100">
+
+                            <i class="fa fa-lock me-2"></i>
+                            Opdater adgangskode
+
+                        </button>
+
+                    </form>
+
+                </div>
+            }
 
         </div>
 
@@ -231,19 +249,24 @@
             <div class="profile-card">
 
                 <h2 class="profile-card-title">
+
                     <i class="fa fa-shopping-bag me-2"
                        style="color:#B47F41;"></i>
-                    Mine ordrer
-                </h2>
 
+                    Mine ordrer
+
+                </h2>
 
                 @if (Model.Orders.Count == 0)
                 {
                     <div class="profile-order-placeholder">
+
                         <i class="fa fa-shopping-cart mb-3"
                            style="font-size:2.5rem;color:#B47F41;"></i>
 
-                        <h5 class="fw-bold">Ingen ordrer endnu</h5>
+                        <h5 class="fw-bold">
+                            Ingen ordrer endnu
+                        </h5>
 
                         <p class="mb-3">
                             Du har ikke gennemført nogen ordrer endnu.
@@ -253,12 +276,15 @@
                            class="profile-button d-inline-block text-decoration-none">
                             Se monstre
                         </a>
+
                     </div>
                 }
                 else
                 {
                     <div class="table-responsive">
+
                         <table class="table align-middle">
+
                             <thead>
                                 <tr>
                                     <th>Ordre</th>
@@ -270,9 +296,11 @@
                             </thead>
 
                             <tbody>
+
                                 @foreach (var order in Model.Orders)
                                 {
                                     <tr>
+
                                         <td class="fw-bold">
                                             #@order.OrderID
                                         </td>
@@ -286,6 +314,7 @@
                                         </td>
 
                                         <td>
+
                                             @if (order.PaymentStatus == "Paid")
                                             {
                                                 <span class="badge bg-success">
@@ -304,9 +333,11 @@
                                                     Fejlet
                                                 </span>
                                             }
+
                                         </td>
 
                                         <td>
+
                                             @if (order.PaymentStatus == "Paid")
                                             {
                                                 <a asp-page="/OrderConfirmation"
@@ -316,14 +347,18 @@
                                                     Se ordre
                                                 </a>
                                             }
+
                                         </td>
+
                                     </tr>
                                 }
+
                             </tbody>
+
                         </table>
+
                     </div>
                 }
-
 
             </div>
 

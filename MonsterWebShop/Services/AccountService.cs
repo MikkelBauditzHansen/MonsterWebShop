@@ -17,9 +17,10 @@ namespace MonsterWebShop.Services
             this.accountRepo = accountRepo;
             this.passwordHasher = passwordHasher;
         }
+
         public bool ResetPassword(
-    string token,
-    string newPassword)
+            string token,
+            string newPassword)
         {
             Account? account =
                 accountRepo.GetAccountByResetToken(token);
@@ -29,44 +30,65 @@ namespace MonsterWebShop.Services
                 return false;
             }
 
+            // Kun kunder må nulstille adgangskoden
+            if (account.Role != "Customer")
+            {
+                return false;
+            }
+
+            // Kontroller at token har en udløbsdato
             if (account.PasswordResetTokenExpires == null)
             {
                 return false;
             }
 
-            if (account.PasswordResetTokenExpires < DateTime.UtcNow)
+            // Kontroller at token ikke er udløbet
+            if (account.PasswordResetTokenExpires <= DateTime.UtcNow)
             {
                 return false;
             }
 
+            // Kontroller at adgangskoden opfylder kravene
             if (!PasswordPolicy.IsValid(newPassword))
             {
                 return false;
             }
 
+            // Hash den nye adgangskode
             string passwordHash =
                 passwordHasher.HashPassword(newPassword);
 
             account.PasswordHash = passwordHash;
 
+            // Fjern token efter brug
             account.PasswordResetToken = null;
-
             account.PasswordResetTokenExpires = null;
 
+            // Gem ændringerne i databasen
             accountRepo.UpdateAccount(account);
 
             return true;
         }
+
+
         public string? CreatePasswordResetToken(string email)
         {
             Account? account =
                 accountRepo.GetAccountByEmail(email);
 
+            // Kontroller at kontoen eksisterer
             if (account == null)
             {
                 return null;
             }
 
+            // Kun kunder må nulstille adgangskoden
+            if (account.Role != "Customer")
+            {
+                return null;
+            }
+
+            // Generer et sikkert token
             string token =
                 Convert.ToHexString(
                     RandomNumberGenerator.GetBytes(32)
@@ -81,6 +103,7 @@ namespace MonsterWebShop.Services
 
             return token;
         }
+
         public bool Register(
     string username,
     string email,
